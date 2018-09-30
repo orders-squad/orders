@@ -78,6 +78,7 @@ Vagrant.configure("2") do |config|
     sudo apt-get -y autoremove
     sudo pip3 install --upgrade pip
     sudo pip3 install -r requirements.txt --ignore-installed
+    sudo pip3 install python-dotenv
     python3 migrate.py db init
     python3 migrate.py db migrate
     python3 migrate.py db upgrade

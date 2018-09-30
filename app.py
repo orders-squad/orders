@@ -6,9 +6,6 @@ from flask_restful import Api
 from models import db, OrderSchema, Order
 from view import OrderListResource
 
-DEBUG = (os.getenv('DEBUG', 'False') == 'True')
-PORT = os.getenv('PORT', '5000')
-
 # Create Flask application
 app = Flask(__name__)
 
@@ -33,6 +30,6 @@ api.add_resource(OrderListResource, '/orders/')
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',
+    app.run(host=app.config['HOST'],
             port=app.config['PORT'],
             debug=app.config['DEBUG'])
