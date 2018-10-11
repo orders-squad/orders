@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from sqlalchemy.exc import SQLAlchemyError
-from models import db, OrderSchema, Order
+from .models import db, OrderSchema, Order
 
 
 orderSchema = OrderSchema()
