@@ -12,7 +12,7 @@ HOST = os.getenv('HOST', '0.0.0.0')
 db_user = os.getenv('DB_USER', 'flaskrest02')
 db_pass = os.getenv('DB_PASS', 'flaskrest02')
 db_name = os.getenv('DB_NAME', 'flaskrest02')
-db_addr = os.getenv('DB_ADDR', '127.0.0.1')
+db_addr = os.getenv('DB_ADDR', '127.0.0.1:5432')
 
 
 SQLALCHEMY_ECHO = False

@@ -8,15 +8,15 @@ APP_DB_PASS=flaskrest02
 APP_DB_NAME=$APP_DB_USER
 
 # Edit the following to change the version of PostgreSQL that is installed
-PG_VERSION=9.4
+PG_VERSION=10
 
 ###########################################################
 # Changes below this line are probably not necessary
 ###########################################################
 print_db_usage () {
-  echo "Your PostgreSQL database has been setup and can be accessed on your local machine on the forwarded port (default: 15432)"
+  echo "Your PostgreSQL database has been setup and can be accessed on your local machine on the forwarded port (default: 5432)"
   echo "  Host: localhost"
-  echo "  Port: 15432"
+  echo "  Port: 5432"
   echo "  Database: $APP_DB_NAME"
   echo "  Username: $APP_DB_USER"
   echo "  Password: $APP_DB_PASS"
@@ -31,10 +31,10 @@ print_db_usage () {
   echo "  PGUSER=$APP_DB_USER PGPASSWORD=$APP_DB_PASS psql -h localhost $APP_DB_NAME"
   echo ""
   echo "Env variable for application development:"
-  echo "  DATABASE_URL=postgresql://$APP_DB_USER:$APP_DB_PASS@localhost:15432/$APP_DB_NAME"
+  echo "  DATABASE_URL=postgresql://$APP_DB_USER:$APP_DB_PASS@localhost:5432/$APP_DB_NAME"
   echo ""
   echo "Local command to access the database via psql:"
-  echo "  PGUSER=$APP_DB_USER PGPASSWORD=$APP_DB_PASS psql -h localhost -p 15432 $APP_DB_NAME"
+  echo "  PGUSER=$APP_DB_USER PGPASSWORD=$APP_DB_PASS psql -h localhost -p 5432 $APP_DB_NAME"
 }
 
 export DEBIAN_FRONTEND=noninteractive
@@ -50,18 +50,25 @@ then
 fi
 
 PG_REPO_APT_SOURCE=/etc/apt/sources.list.d/pgdg.list
-if [ ! -f "$PG_REPO_APT_SOURCE" ]
-then
+#if [ ! -f "$PG_REPO_APT_SOURCE" ]
+#then
+  echo "updating pgdg list"
+  rm -f /etc/apt/sources.list.d/pgdg.list
   # Add PG apt repo:
-  echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > "$PG_REPO_APT_SOURCE"
+  echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > "$PG_REPO_APT_SOURCE"
 
   # Add PGDG repo key:
   wget --quiet -O - https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add -
-fi
+#fi
 
 # Update package list and upgrade all packages
-apt-get update
 apt-get -y upgrade
+
+
+
+#echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" | sudo tee /etc/apt/sources.list.d/postgresql.list
+
+sudo apt update
 
 apt-get -y install "postgresql-$PG_VERSION" "postgresql-contrib-$PG_VERSION"
 
