@@ -9,7 +9,6 @@ orderSchema = OrderSchema()
 
 class OrderListResource(Resource):
     def get(self):
-        # orders = Order.query.all()
         orders = Order.get_all()
         result = orderSchema.dump(orders, many=True)
         return result
