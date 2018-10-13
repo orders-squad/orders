@@ -9,8 +9,8 @@ orderSchema = OrderSchema()
 
 class OrderListResource(Resource):
     def get(self):
-        orders = Order.query.all()
-        result = orderSchema.dump(orders, many=True).data
+        orders = Order.get_all()
+        result = orderSchema.dump(orders, many=True)
         return result
 
     def post(self):
@@ -24,8 +24,8 @@ class OrderListResource(Resource):
         try:
             order = Order(request_dict['qty'], request_dict['price'])
             order.save()
-            query = Order.query.get(order.prod_id)
-            result = orderSchema.dump(query).data
+            query = Order.get(order.prod_id)
+            result = orderSchema.dump(query)
             return result, 201
         except SQLAlchemyError as e:
             db.session.rollbak()
