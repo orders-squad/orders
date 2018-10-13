@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/bionic64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -79,8 +79,14 @@ Vagrant.configure("2") do |config|
     sudo pip3 install --upgrade pip
     sudo pip3 install -r requirements.txt --ignore-installed
     sudo pip3 install python-dotenv
-    python3 migrate.py db init
+    if [ ! -d migrations ]; then
+        python3 migrate.py db init
+    fi
     python3 migrate.py db migrate
     python3 migrate.py db upgrade
   SHELL
+
+  config.vm.provision :shell, :inline =>
+    "sudo service postgresql restart",
+  run: "always"
 end
