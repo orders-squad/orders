@@ -79,11 +79,14 @@ Vagrant.configure("2") do |config|
     sudo pip3 install --upgrade pip
     sudo pip3 install -r requirements.txt --ignore-installed
     sudo pip3 install python-dotenv
-    sudo service postgresql restart
     if [ ! -d migrations ]; then
         python3 migrate.py db init
     fi
     python3 migrate.py db migrate
     python3 migrate.py db upgrade
   SHELL
+
+  config.vm.provision :shell, :inline =>
+    "sudo service postgresql restart",
+  run: "always"
 end
