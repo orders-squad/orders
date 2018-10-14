@@ -10,6 +10,8 @@ import unittest
 import os
 from app import app
 from app.models import Order, db
+import app.view as service
+import logging
 
 
 db_user = os.getenv('DB_USER', 'flaskrest02')
@@ -33,6 +35,7 @@ class TestOrders(unittest.TestCase):
     def setUpClass(cls):
         """ These run once per Test suite """
         app.debug = False
+        service.initialize_logging(logging.INFO)
         app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
