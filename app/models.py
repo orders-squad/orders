@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 import app
-
+import logging
 
 db = SQLAlchemy()
 ma = Marshmallow(app)
@@ -12,6 +12,8 @@ class Order(db.Model):
     """
     This is the Order class
     """
+    logger = logging.getLogger(__name__)
+    app = None
     __tablename__ = 'order'
 
     prod_id = db.Column(db.Integer, primary_key=True)
@@ -28,7 +30,9 @@ class Order(db.Model):
         self.price = price
 
     @staticmethod
-    def get_all():
+    def all():
+        """ Returns all orders in the database """
+        Order.logger.info("Processing all orders")
         return Order.query.all()
 
     @staticmethod
@@ -37,6 +41,16 @@ class Order(db.Model):
 
     def __repr__(self):
         return 'Order: id={}, qty={}, price={}'.format(self.prod_id, self.qty, self.price)
+
+    @staticmethod
+    def init_db(app):
+        """ Initializes the database session """
+        Order.logger.info('Initializing database')
+        Order.app = app
+        # This is where we initialize SQLAlchemy from the Flask app
+        db.init_app(app)
+        app.app_context().push()
+        db.create_all()  # make our sqlalchemy tables
 
 
 class OrderSchema(ma.Schema):

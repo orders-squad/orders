@@ -23,6 +23,8 @@ DATABASE_URI = \
                                                                   DB_ADDR=db_addr,
                                                                   DB_NAME=db_name)
 
+# DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+
 
 class TestOrders(unittest.TestCase):
     """ Test cases for Orders """
@@ -36,3 +38,23 @@ class TestOrders(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         pass
+
+    def setUp(self):
+        Order.init_db(app)
+        db.drop_all()  # clean up the last tests
+        db.create_all()  # make our sqlalchemy tables
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_get_all_orders(self):
+        """ Get all orders """
+        orders = Order.all()
+        self.assertEqual(orders, [])
+
+######################################################################
+#   M A I N
+######################################################################
+if __name__ == '__main__':
+    unittest.main()
