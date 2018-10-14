@@ -8,8 +8,7 @@ Test cases can be run with:
 
 import unittest
 import os
-from app import create_app
-from app import models
+from app import app
 from app.models import Order, db
 import app.view as service
 import logging
@@ -26,6 +25,8 @@ DATABASE_URI = \
                                                                   DB_ADDR=db_addr,
                                                                   DB_NAME=db_name)
 
+# DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+
 
 class TestOrders(unittest.TestCase):
     """ Test cases for Orders """
@@ -33,17 +34,16 @@ class TestOrders(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ These run once per Test suite """
-        service.app.debug = False
+        app.debug = False
         service.initialize_logging(logging.INFO)
-        service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
         pass
 
     def setUp(self):
-        self.app = service.app
-        Order.init_db(self.app)
+        Order.init_db(app)
         db.drop_all()  # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
