@@ -1,11 +1,10 @@
 from marshmallow import Schema, fields
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
-import app
 import logging
 
+
 db = SQLAlchemy()
-ma = Marshmallow(app)
 
 
 class Order(db.Model):
@@ -53,7 +52,7 @@ class Order(db.Model):
         db.create_all()  # make our sqlalchemy tables
 
 
-class OrderSchema(ma.Schema):
+class OrderSchema(Schema):
     """
     This Schema is for validation
     """

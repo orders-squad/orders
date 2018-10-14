@@ -1,20 +1,21 @@
-from flask import Flask, Blueprint
-from flask_restful import Api
-from app.models import db
-from app.view import OrderListResource
+from flask import Flask
+# from app.models import Order
 
-# Create Flask application
-app = Flask(__name__)
+#########################################################
+# this method create_app is as per the pattern
+# suggested in the following link:
+# http://flask.pocoo.org/docs/1.0/patterns/appfactories/
+#########################################################
 
-config_filename = 'config'
 
-app.config.from_object(config_filename)
+def create_app(config_name):
+    app_to_create = Flask(__name__)
+    app_to_create.config.from_object(config_name)
+    # Order.init_db(app_to_create)
+    return app_to_create
 
-db.init_app(app)
 
-api_bp = Blueprint('api', __name__)
-api = Api(api_bp)
-
-app.register_blueprint(api_bp, url_prefix='/api')
-
-api.add_resource(OrderListResource, '/orders/')
+config_file = 'config'
+app = create_app(config_file)
+from app.view import add_blueprints
+add_blueprints(app)
