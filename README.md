@@ -1,4 +1,5 @@
-# devops-orders
+# devops-orders [![Build Status](https://travis-ci.org/orders-squad/orders.svg?branch=master)](https://travis-ci.org/orders-squad/orders)
+
 Orders microservice
 
 
