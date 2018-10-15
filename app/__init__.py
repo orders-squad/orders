@@ -1,21 +1,28 @@
+"""
+Package: app
+
+Package for the application models and services
+This module also sets up the logging to be used with gunicorn
+"""
+import logging
 from flask import Flask
-# from app.models import Order
 
-#########################################################
-# this method create_app is as per the pattern
-# suggested in the following link:
-# http://flask.pocoo.org/docs/1.0/patterns/appfactories/
-#########################################################
+# Create Flask application
+app = Flask(__name__)
+# We'll just use SQLite here so we don't need an external database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../db/development.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'please, tell nobody... Shhhh'
+app.config['LOGGING_LEVEL'] = logging.INFO
 
+import service
 
-def create_app(config_name):
-    app_to_create = Flask(__name__)
-    app_to_create.config.from_object(config_name)
-    # Order.init_db(app_to_create)
-    return app_to_create
+# Set up logging for production
+print 'Setting up logging for {}...'.format(__name__)
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    if gunicorn_logger:
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
 
-
-config_file = 'config'
-app = create_app(config_file)
-from app.view import add_blueprints
-add_blueprints(app)
+app.logger.info('Logging established')
