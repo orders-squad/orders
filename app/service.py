@@ -105,6 +105,22 @@ def update_orders(order_id):
     order.save()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# DELETE AN EXISTING ORDER
+######################################################################
+@app.route('/orders/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    """
+    Delete an Order
+    This endpoint will delete an Order based the body that is posted
+    """
+    check_content_type('application/json')
+    order = Order.find(order_id)
+    if order:
+        order.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+    
 
 ######################################################################
 # REQUEST A REFUND
@@ -122,11 +138,13 @@ def request_refund(order_id):
     order.id = order_id
     order.status = "refund_requested"
     order.save()
+    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
-# APPROVE A REFUND ######################################################################
+# APPROVE A REFUND
+# ######################################################################
 @app.route('/orders/<int:order_id>/approve-refund', methods=['POST'])
 def approve_refund(order_id):
     """
@@ -140,6 +158,7 @@ def approve_refund(order_id):
     order.id = order_id
     order.status = "refund_approved"
     order.save()
+    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
@@ -163,7 +182,22 @@ def display_order(id):
     return make_response(jsonify(message),return_code)
 
 
+# DENY A REFUND ######################################################################
+@app.route('/orders/<int:order_id>/deny-refund', methods=['POST'])
+def deny_refund(order_id):
+    """
+    Deny a refund of an order
 
+    This endpoint will deny a refund of an Order based the id specified in the path
+    """
+    order = Order.find(order_id)
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(order_id))
+    order.id = order_id
+    order.status = "refund_denied"
+    order.save()
+    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
