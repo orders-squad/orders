@@ -105,6 +105,22 @@ def update_orders(order_id):
     order.save()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# DELETE AN EXISTING ORDER
+######################################################################
+@app.route('/orders/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    """
+    Delete an Order
+    This endpoint will delete an Order based the body that is posted
+    """
+    check_content_type('application/json')
+    order = Order.find(order_id)
+    if order:
+        order.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+    
 
 ######################################################################
 # REQUEST A REFUND

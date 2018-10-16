@@ -103,6 +103,17 @@ class TestOrderServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['prod_name'], 'cake')
 
+    def test_delete_order(self):
+        """ Delete an Order that exists """
+        # save the current number of orders for later comparrison
+        order_count = self.get_order_count()
+        # delete an order
+        resp = self.client.delete('/orders/2', content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        new_count = self.get_order_count()
+        self.assertEqual(new_count, order_count - 1)
+
     def test_query_order_list_by_cust_id(self):
         """ Query Orders by Category """
         resp = self.client.get('/orders',
