@@ -125,6 +125,24 @@ def request_refund(order_id):
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
+######################################################################
+# APPROVE A REFUND ######################################################################
+@app.route('/orders/<int:order_id>/approve-refund', methods=['POST'])
+def approve_refund(order_id):
+    """
+    Approve a refund of an order
+
+    This endpoint will approve a refund of an Order based the id specified in the path
+    """
+    order = Order.find(order_id)
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(order_id))
+    order.id = order_id
+    order.status = "refund_approved"
+    order.save()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
