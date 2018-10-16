@@ -136,16 +136,22 @@ class TestOrderServer(unittest.TestCase):
         self.assertEqual(new_json['status'], 'refund_approved')
 
     def test_display_order(self):
-        '''Retrieve one order'''
-        resp = self.client.get('/orders')
+        
+        new_order = dict(prod_id=2, prod_name='coat', cust_id=2, id=2, price=19.5, status='refund_approved')
+        data = json.dumps(new_order)
+        resp = self.client.post('/orders',
+                                data=data,
+                                content_type='application/json')
+
+        resp = self.client.get('/orders/2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(data['id'],'3')
+        self.assertEqual(data['id'],2)
 
 
     def test_display_nonexisting_order(self):
         '''Get a order that doesn't exist'''
-        resp=self.client.get('/orders/3')
+        resp=self.client.get('/orders/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_bad_approve_refund(self):

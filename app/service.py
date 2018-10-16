@@ -146,7 +146,7 @@ def approve_refund(order_id):
 ######################################################################
 #DISPLAY AN ORDER
 ######################################################################
-@app.route('/orders', methods=['GET'])
+@app.route('/orders/<int:id>', methods=['GET'])
 def display_order(id):
     '''Retrieve an order with specific id'''
     app.logger.info('Finding an order with id [{}]'.format(id))
@@ -154,10 +154,11 @@ def display_order(id):
     
     if order:
         message = order.serialize()
-        return_code = HTTP_200_OK
+        return_code = status.HTTP_200_OK
     else:
         message = {'error' : 'Order with id: %s was not found' % str(id)}
-        return_code = HTTP_404_NOT_FOUND
+        return_code = status.HTTP_404_NOT_FOUND
+    
 
     return make_response(jsonify(message),return_code)
 
