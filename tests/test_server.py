@@ -112,6 +112,14 @@ class TestOrderServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['prod_name'], 'bread')
+        
+    def test_request_refund(self):
+        """ Request a refund """
+        order = Order.find_by_name('cake')[0]
+        resp = self.client.post('/orders/{}/request-refund'.format(order.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['status'], 'refund_requested')
 
     def test_method_not_supported(self):
         """ Send server a method that is not supported by it """
