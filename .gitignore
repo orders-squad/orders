@@ -118,6 +118,7 @@ db.sqlite3
 instance/
 .webassets-cache
 migrations/
+db/
 
 # Scrapy stuff:
 .scrapy

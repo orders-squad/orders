@@ -123,11 +123,48 @@ class TestOrderServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['prod_name'], 'bread')
+        
+    def test_request_refund(self):
+        """ Request a refund """
+        order = Order.find_by_name('cake')[0]
+        resp = self.client.post('/orders/{}/request-refund'.format(order.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['status'], 'refund_requested')
+
+    def test_bad_request_refund(self):
+        """ Test a bad refund request error from invalid order id """
+        order = 11111
+        resp = self.client.post('/orders/{}/request-refund'.format(order))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_approve_refund(self):
+        """ Approve a refund """
+        order = Order.find_by_name('cake')[0]
+        resp = self.client.post('/orders/{}/approve-refund'.format(order.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['status'], 'refund_approved')
+
+    def test_bad_approve_refund(self):
+        """ Test a bad refund approval error from invalid order id """
+        order = 11111
+        resp = self.client.post('/orders/{}/approve-refund'.format(order))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_method_not_supported(self):
         """ Send server a method that is not supported by it """
         resp = self.client.patch('/orders')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_missing_content_type(self):
+        """ test check content type """
+        new_order = dict(prod_id=3, prod_name='cake', cust_id=3, price=5.2, status='refund_approved')
+        data = json.dumps(new_order)
+        resp = self.client.post('/orders',
+                                data=data)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
     # @patch('app.service.Order.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
