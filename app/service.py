@@ -143,6 +143,26 @@ def approve_refund(order_id):
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
+######################################################################
+#DISPLAY AN ORDER
+######################################################################
+@app.route('/orders', methods=['GET'])
+def display_order(id):
+    '''Retrieve an order with specific id'''
+    app.logger.info('Finding an order with id [{}]'.format(id))
+    order=Order.find(id)
+    
+    if order:
+        message = order.serialize()
+        return_code = HTTP_200_OK
+    else:
+        message = {'error' : 'Order with id: %s was not found' % str(id)}
+        return_code = HTTP_404_NOT_FOUND
+
+    return make_response(jsonify(message),return_code)
+
+
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
