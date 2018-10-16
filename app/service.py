@@ -105,6 +105,25 @@ def update_orders(order_id):
     order.save()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# DELETE AN EXISTING ORDER
+######################################################################
+@app.route('/orders/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    """
+    Delete an Order
+    This endpoint will delete an Order based the body that is posted
+    """
+    check_content_type('application/json')
+    order = Order.find(order_id)
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(order_id))
+    else:
+        order.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+    
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -117,9 +136,10 @@ def init_db():
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
-    if request.headers['Content-Type'] == content_type:
-        return
-    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+    if 'Content-Type' in request.headers:
+        if request.headers['Content-Type'] == content_type:
+            return
+        app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
 
 def initialize_logging(log_level=logging.INFO):
