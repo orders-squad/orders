@@ -87,7 +87,7 @@ class TestOrders(unittest.TestCase):
         order = Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved')
         order.save()
         self.assertEqual(len(Order.all()), 1)
-        # delete the pet and make sure it isn't in the database
+        # delete an order and make sure it isn't in the database
         order.delete()
         self.assertEqual(len(Order.all()), 0)
 
