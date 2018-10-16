@@ -121,10 +121,18 @@ class TestOrderServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['status'], 'refund_requested')
 
+    def test_bad_request_refund(self):
+        """ Test a bad refund request error from invalid order id """
+        order = 11111
+        resp = self.client.post('/orders/{}/request-refund'.format(order))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_method_not_supported(self):
         """ Send server a method that is not supported by it """
         resp = self.client.patch('/orders')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
     # @patch('app.service.Order.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
