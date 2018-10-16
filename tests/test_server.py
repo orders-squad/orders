@@ -141,6 +141,20 @@ class TestOrderServer(unittest.TestCase):
         resp = self.client.post('/orders/{}/approve-refund'.format(order))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_deny_refund(self):
+        """ Deny a refund """
+        order = Order.find_by_name('cake')[0]
+        resp = self.client.post('/orders/{}/deny-refund'.format(order.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['status'], 'refund_denied')
+
+    def test_bad_deny_refund(self):
+        """ Test a bad refund denial error from invalid order id """
+        order = 11111
+        resp = self.client.post('/orders/{}/deny-refund'.format(order))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_method_not_supported(self):
         """ Send server a method that is not supported by it """
         resp = self.client.patch('/orders')

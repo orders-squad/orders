@@ -126,7 +126,8 @@ def request_refund(order_id):
 
 
 ######################################################################
-# APPROVE A REFUND ######################################################################
+# APPROVE A REFUND
+# ######################################################################
 @app.route('/orders/<int:order_id>/approve-refund', methods=['POST'])
 def approve_refund(order_id):
     """
@@ -143,6 +144,22 @@ def approve_refund(order_id):
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
+######################################################################
+# DENY A REFUND ######################################################################
+@app.route('/orders/<int:order_id>/deny-refund', methods=['POST'])
+def deny_refund(order_id):
+    """
+    Deny a refund of an order
+
+    This endpoint will deny a refund of an Order based the id specified in the path
+    """
+    order = Order.find(order_id)
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(order_id))
+    order.id = order_id
+    order.status = "refund_denied"
+    order.save()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
