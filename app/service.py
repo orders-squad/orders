@@ -122,6 +122,7 @@ def request_refund(order_id):
     order.id = order_id
     order.status = "refund_requested"
     order.save()
+    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
@@ -141,6 +142,7 @@ def approve_refund(order_id):
     order.id = order_id
     order.status = "refund_approved"
     order.save()
+    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 
@@ -159,6 +161,7 @@ def deny_refund(order_id):
     order.id = order_id
     order.status = "refund_denied"
     order.save()
+    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 ######################################################################
