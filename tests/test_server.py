@@ -117,6 +117,14 @@ class TestOrderServer(unittest.TestCase):
         """ Send server a method that is not supported by it """
         resp = self.client.patch('/orders')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_missing_content_type(self):
+        """ test check content type """
+        new_order = dict(prod_id=3, prod_name='cake', cust_id=3, price=5.2, status='refund_approved')
+        data = json.dumps(new_order)
+        resp = self.client.post('/orders',
+                                data=data)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
     # @patch('app.service.Order.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
