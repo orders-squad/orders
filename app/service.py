@@ -163,6 +163,25 @@ def approve_refund(order_id):
 
 
 ######################################################################
+#DISPLAY AN ORDER
+######################################################################
+@app.route('/orders/<int:id>', methods=['GET'])
+def display_order(id):
+    '''Retrieve an order with specific id'''
+    app.logger.info('Finding an order with id [{}]'.format(id))
+    order=Order.find(id)
+    
+    if order:
+        message = order.serialize()
+        return_code = status.HTTP_200_OK
+    else:
+        message = {'error' : 'Order with id: %s was not found' % str(id)}
+        return_code = status.HTTP_404_NOT_FOUND
+    
+
+    return make_response(jsonify(message),return_code)
+
+
 # DENY A REFUND ######################################################################
 @app.route('/orders/<int:order_id>/deny-refund', methods=['POST'])
 def deny_refund(order_id):
