@@ -8,6 +8,7 @@ Test cases can be run with the following:
 """
 
 import unittest
+
 import os
 import json
 import logging
@@ -155,16 +156,14 @@ class TestOrderServer(unittest.TestCase):
         resp = self.client.post('/orders',
                                 data=data,
                                 content_type='application/json')
-
         resp = self.client.get('/orders/2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(data['id'],2)
-
+        self.assertEqual(data['id'], 2)
 
     def test_display_nonexisting_order(self):
-        '''Get a order that doesn't exist'''
-        resp=self.client.get('/orders/0')
+        """ Get a order that doesn't exist """
+        resp = self.client.get('/orders/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_bad_approve_refund(self):

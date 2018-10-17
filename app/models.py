@@ -61,14 +61,15 @@ class Order(db.Model):
             Warning: since decimal is not supported by SQLite, we'll
             use float as a workaround
         """
-        return {"id": self.id,
-                "prod_id": self.prod_id,
-                "prod_name": self.prod_name,
-                "cust_id": self.cust_id,
-                "price": self.price,
-                "created_on": self.created_on,
-                "status": self.status
-                }
+        return {
+            "id": self.id,
+            "prod_id": self.prod_id,
+            "prod_name": self.prod_name,
+            "cust_id": self.cust_id,
+            "price": self.price,
+            "created_on": self.created_on,
+            "status": self.status
+            }
 
     def deserialize(self, data):
         try:
@@ -80,7 +81,7 @@ class Order(db.Model):
         except KeyError as error:
             raise DataValidationError('Invalid order: missing ' + error.args[0])
         except TypeError as error:
-            raise DataValidationError('Invalid order: body of request contained' \
+            raise DataValidationError('Invalid order: body of request contained' 
                                       'bad or no data')
         return self
 
