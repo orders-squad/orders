@@ -184,14 +184,14 @@ def deny_refund(order_id):
 @app.route('/orders/<int:order_id>', methods=['GET'])
 def display_order(order_id):
     """ Retrieve an order with specific id """
-    app.logger.info('Finding an order with id [{}]'.format(id))
+    app.logger.info('Finding an order with id [{}]'.format(order_id))
     order = Order.find(order_id)
     
     if order:
         message = order.serialize()
         return_code = status.HTTP_200_OK
     else:
-        message = {'error': 'Order with id: %s was not found' % str(id)}
+        message = {'error': 'Order with id: %s was not found' % str(order_id)}
         return_code = status.HTTP_404_NOT_FOUND
 
     return make_response(jsonify(message), return_code)
