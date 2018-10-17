@@ -78,8 +78,7 @@ def create_orders():
     # Warning: since get_orders has not been implemented yet, we
     # use a placeholder to make nosetests happy, which means
     # we need to add the REAL URL after get_orders code is merged
-    location_url = "localhost:5000/placeholder"
-                   #url_for('get_orders', order_id=order.id, _external=True)
+    location_url = url_for('display_order', id=order.id, _external=True)
     return make_response(jsonify(message), status.HTTP_201_CREATED,
                          {
                              'Location': location_url
