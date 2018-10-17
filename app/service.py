@@ -36,11 +36,13 @@ def index():
     return jsonify(name='Order micro-service REST API Service',
                    version='1.0',
                    paths=url_for('list_orders', _external=True)
-                  ), status.HTTP_200_OK
+                   ), status.HTTP_200_OK
+
 
 ######################################################################
 # LIST ALL ORDERS
 ######################################################################
+
 @app.route('/orders', methods=['GET'])
 def list_orders():
     """ Returns all of the Orders """
@@ -56,9 +58,6 @@ def list_orders():
 
     results = [order.serialize() for order in orders]
     return make_response(jsonify(results), status.HTTP_200_OK)
-
-
-
 
 
 ######################################################################
@@ -104,9 +103,11 @@ def update_orders(order_id):
     order.save()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+
 ######################################################################
 # DELETE AN EXISTING ORDER
 ######################################################################
+
 @app.route('/orders/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
     """
@@ -120,11 +121,10 @@ def delete_order(order_id):
     return make_response('', status.HTTP_204_NO_CONTENT)
 
     
-
 ######################################################################
 # REQUEST A REFUND
 ######################################################################
-@app.route('/orders/<int:order_id>/request-refund', methods=['POST'])
+@app.route('/orders/<int:order_id>/request-refund', methods=['PUT'])
 def request_refund(order_id):
     """
     Request a refund of an order
@@ -143,8 +143,8 @@ def request_refund(order_id):
 
 ######################################################################
 # APPROVE A REFUND
-# ######################################################################
-@app.route('/orders/<int:order_id>/approve-refund', methods=['POST'])
+######################################################################
+@app.route('/orders/<int:order_id>/approve-refund', methods=['PUT'])
 def approve_refund(order_id):
     """
     Approve a refund of an order
@@ -162,27 +162,9 @@ def approve_refund(order_id):
 
 
 ######################################################################
-#DISPLAY AN ORDER
+# DENY A REFUND
 ######################################################################
-@app.route('/orders/<int:id>', methods=['GET'])
-def display_order(id):
-    '''Retrieve an order with specific id'''
-    app.logger.info('Finding an order with id [{}]'.format(id))
-    order=Order.find(id)
-    
-    if order:
-        message = order.serialize()
-        return_code = status.HTTP_200_OK
-    else:
-        message = {'error' : 'Order with id: %s was not found' % str(id)}
-        return_code = status.HTTP_404_NOT_FOUND
-    
-
-    return make_response(jsonify(message),return_code)
-
-
-# DENY A REFUND ######################################################################
-@app.route('/orders/<int:order_id>/deny-refund', methods=['POST'])
+@app.route('/orders/<int:order_id>/deny-refund', methods=['PUT'])
 def deny_refund(order_id):
     """
     Deny a refund of an order
@@ -198,6 +180,26 @@ def deny_refund(order_id):
     Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+
+######################################################################
+# DISPLAY AN ORDER
+######################################################################
+@app.route('/orders/<int:id>', methods=['GET'])
+def display_order(id):
+    """ Retrieve an order with specific id """
+    app.logger.info('Finding an order with id [{}]'.format(id))
+    order = Order.find(id)
+    
+    if order:
+        message = order.serialize()
+        return_code = status.HTTP_200_OK
+    else:
+        message = {'error': 'Order with id: %s was not found' % str(id)}
+        return_code = status.HTTP_404_NOT_FOUND
+
+    return make_response(jsonify(message), return_code)
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -207,6 +209,7 @@ def init_db():
     global app
     Order.init_db(app)
 
+
 def check_content_type(content_type):
     """ Checks that the media type is correct """
     if 'Content-Type' in request.headers:
@@ -214,6 +217,7 @@ def check_content_type(content_type):
             return
         app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
+
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
