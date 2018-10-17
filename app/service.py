@@ -123,7 +123,7 @@ def delete_order(order_id):
 ######################################################################
 # REQUEST A REFUND
 ######################################################################
-@app.route('/orders/<int:order_id>/request-refund', methods=['POST'])
+@app.route('/orders/<int:order_id>/request-refund', methods=['PUT'])
 def request_refund(order_id):
     """
     Request a refund of an order
@@ -142,8 +142,8 @@ def request_refund(order_id):
 
 ######################################################################
 # APPROVE A REFUND
-# ######################################################################
-@app.route('/orders/<int:order_id>/approve-refund', methods=['POST'])
+######################################################################
+@app.route('/orders/<int:order_id>/approve-refund', methods=['PUT'])
 def approve_refund(order_id):
     """
     Approve a refund of an order
@@ -163,7 +163,7 @@ def approve_refund(order_id):
 ######################################################################
 # DENY A REFUND
 ######################################################################
-@app.route('/orders/<int:order_id>/deny-refund', methods=['POST'])
+@app.route('/orders/<int:order_id>/deny-refund', methods=['PUT'])
 def deny_refund(order_id):
     """
     Deny a refund of an order
