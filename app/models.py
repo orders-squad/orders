@@ -5,7 +5,7 @@ All of the models are stored in this module
 
 Models
 ------
-Pet - A Pet used in the Pet Store
+Order - An order model used in the Online Shopping System
 
 Attributes:
 -----------
