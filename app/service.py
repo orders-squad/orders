@@ -74,10 +74,7 @@ def create_orders():
     order.deserialize(request.get_json())
     order.save()
     message = order.serialize()
-    # Warning: since get_orders has not been implemented yet, we
-    # use a placeholder to make nosetests happy, which means
-    # we need to add the REAL URL after get_orders code is merged
-    location_url = url_for('display_order', id=order.id, _external=True)
+    location_url = url_for('display_order', order_id=order.id, _external=True)
     return make_response(jsonify(message), status.HTTP_201_CREATED,
                          {
                              'Location': location_url
@@ -184,17 +181,17 @@ def deny_refund(order_id):
 ######################################################################
 # DISPLAY AN ORDER
 ######################################################################
-@app.route('/orders/<int:id>', methods=['GET'])
-def display_order(id):
+@app.route('/orders/<int:order_id>', methods=['GET'])
+def display_order(order_id):
     """ Retrieve an order with specific id """
-    app.logger.info('Finding an order with id [{}]'.format(id))
-    order = Order.find(id)
+    app.logger.info('Finding an order with id [{}]'.format(order_id))
+    order = Order.find(order_id)
     
     if order:
         message = order.serialize()
         return_code = status.HTTP_200_OK
     else:
-        message = {'error': 'Order with id: %s was not found' % str(id)}
+        message = {'error': 'Order with id: %s was not found' % str(order_id)}
         return_code = status.HTTP_404_NOT_FOUND
 
     return make_response(jsonify(message), return_code)
