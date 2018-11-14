@@ -79,11 +79,13 @@ class Order(db.Model):
             self.price = float(data['price'])
             self.status = data['status']
         except KeyError as error:
-            raise DataValidationError('Invalid order: missing ' + error.args[0])
+            # raise DataValidationError('Invalid order: missing ' + error.args[0])
+            return 'Invalid order: missing ' + error.args[0], False
         except TypeError as error:
-            raise DataValidationError('Invalid order: body of request contained' 
-                                      'bad or no data')
-        return self
+            # raise DataValidationError('Invalid order: body of request contained'
+            #                           'bad or no data')
+            return 'Invalid order: body of request has bad or no data', False
+        return self, True
 
     @staticmethod
     def init_db(app):

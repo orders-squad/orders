@@ -121,7 +121,9 @@ class TestOrders(unittest.TestCase):
         """ Test deserialization of bad data """
         data = "this is not a dictionary"
         order = Order()
-        self.assertRaises(DataValidationError, order.deserialize, data)
+        # self.assertRaises(DataValidationError, order.deserialize, data)
+        res, is_success = order.deserialize(data)
+        self.assertFalse(is_success)
 
     def test_find_by_order_id(self):
         """ Find an order by order ID """
