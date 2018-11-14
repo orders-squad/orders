@@ -23,3 +23,6 @@ httpie==0.9.9
 # Code coverage
 coverage==4.5.1
 codecov==2.0.15
+
+#honcho
+honcho==1.0.1
