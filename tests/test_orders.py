@@ -8,7 +8,7 @@ Test cases can be run with:
 
 import unittest
 import os
-from app.models import Order, DataValidationError, db
+from app.models import Order, OrderItem, DataValidationError, db
 from app import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
@@ -45,20 +45,50 @@ class TestOrders(unittest.TestCase):
         """ Create an order and assert that it exists """
         # note that since the data is not committed yet, the model data only resides in RAM but not in
         # database.
-        order = Order(prod_id=0, prod_name='bread', cust_id=1, price=8.2, status='refund_not_requested')
+
+        items = [{"prod_id": 1,
+                  "prod_name": "kindle",
+                  "prod_qty": 2,
+                  "prod_price": 49.95,
+                  "status": "ordered"
+                  },
+                 {"prod_id": 2,
+                  "prod_name": "iphone 6",
+                  "prod_qty": 2,
+                  "prod_price": 199,
+                  "status": "ordered"
+                  }
+                 ]
+        order = Order(cust_id=1)
+        for item in items:
+            order.items.append(OrderItem(prod_id=item['prod_id'],
+                                         prod_name=item['prod_name'],
+                                         prod_qty=item['prod_qty'],
+                                         prod_price=item['prod_price'],
+                                         status=item['status']))
+
         self.assertIsNotNone(order)
         self.assertIsNone(order.id)
-        self.assertEqual(order.prod_name, "bread")
         self.assertEqual(order.cust_id, 1)
-        self.assertEqual(order.price, 8.2)
+        #order_item = (OrderItem(prod_id=item['prod_id'],
+        #                        prod_name=item['prod_name'],
+        #                        prod_qty=item['prod_qty'],
+        #                        prod_price=item['prod_price'],
+        #                        status=item['status']))
+        self.assertEqual(order.items[1].prod_id, 2)
+        self.assertEqual(order.items[1].prod_name, "iphone 6")
+        self.assertEqual(order.items[1].prod_qty, 2)
+
+        self.assertEqual(order.items[1].prod_price, 199)
+        self.assertEqual(order.items[1].status, "ordered")
         self.assertEqual(order.created_on, order.updated_on)
-        self.assertEqual(order.status, 'refund_not_requested')
+
 
     def test_add_an_order(self):
         """ Create an order and add it to the database """
         orders = Order.all()
         self.assertEqual(orders, [])
-        order = Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved')
+        order = Order(cust_id=1)
         self.assertIsNotNone(order)
         self.assertIsNone(order.id)
         order.save()
@@ -69,7 +99,7 @@ class TestOrders(unittest.TestCase):
 
     def test_update_an_order(self):
         """ Update an Order """
-        order = Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved')
+        order = Order(cust_id=1)
         order.save()
         self.assertEqual(order.id, 1)
         # Change it an save it
@@ -84,7 +114,7 @@ class TestOrders(unittest.TestCase):
 
     def test_delete_an_order(self):
         """ Delete an Order """
-        order = Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved')
+        order = Order(cust_id=1)
         order.save()
         self.assertEqual(len(Order.all()), 1)
         # delete an order and make sure it isn't in the database
@@ -93,29 +123,60 @@ class TestOrders(unittest.TestCase):
 
     def test_serialize_an_order(self):
         """ Test serialization of an order """
-        order = Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved')
+        items = [{"prod_id": 1,
+                  "prod_name": "kindle",
+                  "prod_qty": 2,
+                  "prod_price": 49.95,
+                  "status": "ordered"
+                  },
+                 {"prod_id": 2,
+                  "prod_name": "iphone 6",
+                  "prod_qty": 2,
+                  "prod_price": 199,
+                  "status": "ordered"
+                  }
+                 ]
+        order = Order(cust_id=1)
+        for item in items:
+            order.items.append(OrderItem(prod_id=item['prod_id'],
+                                         prod_name=item['prod_name'],
+                                         prod_qty=item['prod_qty'],
+                                         prod_price=item['prod_price'],
+                                         status=item['status']))
+
         data = order.serialize()
         self.assertIsNotNone(data)
         self.assertIn('id', data)
         self.assertIsNone(data['id'])
-        self.assertIn('prod_name', data)
-        self.assertEqual(data['prod_name'], "cake")
-        self.assertIn('price', data)
-        self.assertEqual(data['price'], 9.2)
+        self.assertIn('items', data)
+        self.assertEqual(data['items'][0]['prod_name'], "kindle")
+        self.assertEqual(data['items'][0]['prod_qty'], 2)
         self.assertIn('cust_id', data)
         self.assertEqual(data['cust_id'], 1)
 
     def test_deserialize_an_order(self):
         """ Test deserialization of an order """
-        data = {"prod_id": 1, "prod_name": 'cake', "cust_id": 1,
-                "price": 9.2, "status": 'refund_approved'}
+        items = [{"prod_id": 1,
+                  "prod_name": "kindle",
+                  "prod_qty": 2,
+                  "prod_price": 49.95,
+                  "status": "ordered"
+                  },
+                 {"prod_id": 2,
+                  "prod_name": "iphone 6",
+                  "prod_qty": 2,
+                  "prod_price": 199,
+                  "status": "ordered"
+                  }
+                 ]
+        data = {"cust_id": 1, "items": items}
         order = Order()
         order.deserialize(data)
         self.assertIsNotNone(order)
         self.assertIsNone(order.id)
-        self.assertEqual(order.prod_name, "cake")
+        self.assertEqual(order.items[0].prod_name, "kindle")
         self.assertEqual(order.cust_id, 1)
-        self.assertEqual(order.price, 9.2)
+        self.assertEqual(order.items[0].prod_price, 49.95)
 
     def test_deserialize_bad_data(self):
         """ Test deserialization of bad data """
@@ -127,32 +188,80 @@ class TestOrders(unittest.TestCase):
 
     def test_find_by_order_id(self):
         """ Find an order by order ID """
-        Order(prod_id=0, prod_name='bread', cust_id=1, price=8.2, status='refund_not_requested').save()
-        cake = Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved')
+        Order(cust_id=1).save()
+        cake = Order(cust_id=1)
         cake.save()
         order = Order.find(cake.id)
         self.assertIsNotNone(order)
         self.assertEqual(order.id, cake.id)
-        self.assertEqual(order.prod_name, "cake")
         self.assertEqual(order.cust_id, 1)
 
     def test_find_by_cust_id(self):
         """ Find Orders by customer id """
-        Order(prod_id=0, prod_name='bread', cust_id=1, price=8.2, status='refund_not_requested').save()
-        Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved').save()
+        Order(cust_id=1).save()
+        Order(cust_id=1).save()
         orders = Order.find_by_cust_id(1)
         self.assertEqual(orders[0].cust_id, 1)
-        self.assertEqual(orders[0].prod_name, "bread")
-        self.assertEqual(orders[0].price, 8.2)
+
+    def test_find_by_order_item_id(self):
+        """ Find by Order Item"""
+        """ Find a Order by Product Name """
+
+        items = [{"prod_id": 1,
+                  "prod_name": "kindle",
+                  "prod_qty": 2,
+                  "prod_price": 49.95,
+                  "status": "ordered"
+                  },
+                 {"prod_id": 2,
+                  "prod_name": "iphone 6",
+                  "prod_qty": 2,
+                  "prod_price": 199,
+                  "status": "ordered"
+                  }
+                 ]
+        order = Order(cust_id=1)
+        order_item = order.items.append(OrderItem(prod_id=items[0]['prod_id'],
+                                         prod_name=items[0]['prod_name'],
+                                         prod_qty=items[0]['prod_qty'],
+                                         prod_price=items[0]['prod_price'],
+                                         status=items[0]['status']))
+        order.save()
+        print order.items[0].id
+        other_order_item = order.find_by_order_item_id(order.items[0].id)
+
+        self.assertIsNotNone(other_order_item)
+        self.assertEqual(order.items[0].id, other_order_item.id)
 
     def test_find_by_name(self):
         """ Find a Order by Product Name """
-        Order(prod_id=0, prod_name='bread', cust_id=1, price=8.2, status='refund_not_requested').save()
-        Order(prod_id=1, prod_name='cake', cust_id=1, price=9.2, status='refund_approved').save()
-        orders = Order.find_by_name("bread")
+
+        items = [{"prod_id": 1,
+                  "prod_name": "kindle",
+                  "prod_qty": 2,
+                  "prod_price": 49.95,
+                  "status": "ordered"
+                  },
+                 {"prod_id": 2,
+                  "prod_name": "iphone 6",
+                  "prod_qty": 2,
+                  "prod_price": 199,
+                  "status": "ordered"
+                  }
+                 ]
+        order = Order(cust_id=1)
+        for item in items:
+            order.items.append(OrderItem(prod_id=item['prod_id'],
+                                         prod_name=item['prod_name'],
+                                         prod_qty=item['prod_qty'],
+                                         prod_price=item['prod_price'],
+                                         status=item['status']))
+        order.save()
+
+        orders = Order.find_by_name("iphone 6")
         self.assertEqual(orders[0].cust_id, 1)
-        self.assertEqual(orders[0].prod_name, "bread")
-        self.assertEqual(orders[0].price, 8.2)
+        self.assertEqual(orders[0].items[1].prod_id, 2)
+        self.assertEqual(orders[0].items[1].prod_price, 199)
 
 
 ######################################################################

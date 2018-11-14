@@ -98,6 +98,7 @@ def update_orders(order_id):
     order = Order.find(order_id)
     if not order:
         raise NotFound("Order with id '{}' was not found.".format(order_id))
+    print request.get_json()
     order.deserialize(request.get_json())
     order.id = order_id
     order.save()
@@ -124,61 +125,70 @@ def delete_order(order_id):
 ######################################################################
 # REQUEST A REFUND
 ######################################################################
-@app.route('/orders/<int:order_id>/request-refund', methods=['PUT'])
-def request_refund(order_id):
+@app.route('/orders/<int:order_item_id>/request-refund', methods=['PUT'])
+def request_refund(order_item_id):
     """
     Request a refund of an order
 
     This endpoint will request a refund of an Order based the id specified in the path
     """
-    order = Order.find(order_id)
-    if not order:
-        raise NotFound("Order with id '{}' was not found.".format(order_id))
-    order.id = order_id
-    order.status = "refund_requested"
+    order_item = Order.find_by_order_item_id(order_item_id)
+    Order.logger.info(order_item)
+    if not order_item:
+        raise NotFound("Order item id '{}' was not found.".format(order_item_id))
+    order_item.status = "refund_requested"
+    order = Order.find(order_item.order_id)
     order.save()
-    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+    Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+    return make_response(jsonify(order_item.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
 # APPROVE A REFUND
 ######################################################################
-@app.route('/orders/<int:order_id>/approve-refund', methods=['PUT'])
-def approve_refund(order_id):
+@app.route('/orders/<int:order_item_id>/approve-refund', methods=['PUT'])
+def approve_refund(order_item_id):
     """
     Approve a refund of an order
 
     This endpoint will approve a refund of an Order based the id specified in the path
     """
-    order = Order.find(order_id)
-    if not order:
-        raise NotFound("Order with id '{}' was not found.".format(order_id))
-    order.id = order_id
-    order.status = "refund_approved"
+
+    order_item = Order.find_by_order_item_id(order_item_id)
+    Order.logger.info(order_item)
+    if not order_item:
+        raise NotFound("Order item id '{}' was not found.".format(order_item_id))
+    order_item.status = "refund_approved"
+    order = Order.find(order_item.order_id)
     order.save()
-    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+    Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+    return make_response(jsonify(order_item.serialize()), status.HTTP_200_OK)
+
+
+
 
 
 ######################################################################
 # DENY A REFUND
 ######################################################################
-@app.route('/orders/<int:order_id>/deny-refund', methods=['PUT'])
-def deny_refund(order_id):
+@app.route('/orders/<int:order_item_id>/deny-refund', methods=['PUT'])
+def deny_refund(order_item_id):
     """
     Deny a refund of an order
 
     This endpoint will deny a refund of an Order based the id specified in the path
     """
-    order = Order.find(order_id)
-    if not order:
-        raise NotFound("Order with id '{}' was not found.".format(order_id))
-    order.id = order_id
-    order.status = "refund_denied"
+
+    order_item = Order.find_by_order_item_id(order_item_id)
+    Order.logger.info(order_item)
+    if not order_item:
+        raise NotFound("Order item id '{}' was not found.".format(order_item_id))
+    order_item.status = "refund_denied"
+    order = Order.find(order_item.order_id)
     order.save()
-    Order.logger.info("Order with id '%s' set to status '%s'", order.id, order.status)
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+    Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+    return make_response(jsonify(order_item.serialize()), status.HTTP_200_OK)
+
 
 
 ######################################################################
