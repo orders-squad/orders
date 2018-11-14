@@ -35,17 +35,15 @@ class Order(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    prod_id = db.Column(db.Integer)
-    prod_name = db.Column(db.String(63))
     cust_id = db.Column(db.Integer)
-    price = db.Column(db.Float)
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
-    status = db.Column(db.String(63))
+    items = db.relationship('OrderItem', backref='order', lazy='dynamic')
+
 
     def __repr__(self):
         # return '<Order %r>' % (self.name)
-        return 'Order {0}, {1}'.format(self.prod_name, self.id)
+        return str(self.serialize())
 
     def save(self):
         if not self.id:
@@ -63,26 +61,25 @@ class Order(db.Model):
         """
         return {
             "id": self.id,
-            "prod_id": self.prod_id,
-            "prod_name": self.prod_name,
             "cust_id": self.cust_id,
-            "price": self.price,
             "created_on": self.created_on,
-            "status": self.status
+            "items": [item.serialize() for item in self.items]
             }
 
     def deserialize(self, data):
+        if not isinstance(data, dict):
+            raise DataValidationError('Invalid order: body of request contained bad or no data')
         try:
-            self.prod_name = data['prod_name']
-            self.prod_id = data['prod_id']
             self.cust_id = data['cust_id']
-            self.price = float(data['price'])
-            self.status = data['status']
+            for item in data['items']:
+                self.items.append(OrderItem(prod_id=item['prod_id'],
+                                            prod_name=item['prod_name'],
+                                            prod_qty=item['prod_qty'],
+                                            prod_price=float(item['prod_price']),
+                                            status=item['status']))
+
         except KeyError as error:
             raise DataValidationError('Invalid order: missing ' + error.args[0])
-        except TypeError as error:
-            raise DataValidationError('Invalid order: body of request contained' 
-                                      'bad or no data')
         return self
 
     @staticmethod
@@ -111,9 +108,41 @@ class Order(db.Model):
     @staticmethod
     def find_by_name(name):
         Order.logger.info('Processing name query for %s ...', name)
-        return Order.query.filter(Order.prod_name == name)
+        return Order.query.filter(OrderItem.prod_name == name)
+
+
+    @staticmethod
+    def find_by_order_item_id(id):
+        Order.logger.info('Processing name query for %s ...', id)
+        return OrderItem.query.get(id)
 
     @staticmethod
     def find_by_cust_id(cust_id):
         Order.logger.info('Processing customer id query for %s ...', cust_id)
         return Order.query.filter(Order.cust_id == cust_id)
+
+
+class OrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
+    prod_id = db.Column(db.Integer)
+    prod_name = db.Column(db.String(63))
+    prod_qty = db.Column(db.Integer)
+    prod_price = db.Column(db.Float)
+    status = db.Column(db.String(63))
+    created_on = db.Column(db.DateTime, server_default=db.func.now())
+    updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+
+    def serialize(self):
+        """ Serializes an OrderItem into a dictionary """
+        return {
+            "id": self.id,
+            "order_id": self.order_id,
+            "prod_id": self.prod_id,
+            "prod_name": self.prod_name,
+            "prod_qty": self.prod_qty,
+            "prod_price": self.prod_price,
+            "status": self.status,
+            "created_on": self.created_on,
+            "updated_on": self.updated_on
+        }
