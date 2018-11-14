@@ -68,20 +68,19 @@ class Order(db.Model):
 
     def deserialize(self, data):
         if not isinstance(data, dict):
-            raise DataValidationError('Invalid order: body of request contained bad or no data')
+            return "Invalid order: body of request contained bad or no data", False
         try:
             self.cust_id = data['cust_id']
             for item in data['items']:
                 self.items.append(OrderItem(prod_id=item['prod_id'],
-                                            prod_name=item['prod_name'],
-                                            prod_qty=item['prod_qty'],
-                                            prod_price=float(item['prod_price']),
-                                            status=item['status']))
+                prod_name = item['prod_name'],
+                prod_qty = item['prod_qty'],
+                prod_price = float(item['prod_price']),
+                status = item['status']))
         except KeyError as error:
-            raise DataValidationError('Invalid order: missing ' + error.args[0])
-        return self
-
-
+            return "Invalid order: missing " + error.args[0], False
+        return self, True
+    
     @staticmethod
     def init_db(app):
         Order.logger.info('Initializing database')
