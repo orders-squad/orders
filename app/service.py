@@ -71,14 +71,17 @@ def create_orders():
     """
     check_content_type('application/json')
     order = Order()
-    order.deserialize(request.get_json())
-    order.save()
-    message = order.serialize()
-    location_url = url_for('display_order', order_id=order.id, _external=True)
-    return make_response(jsonify(message), status.HTTP_201_CREATED,
-                         {
-                             'Location': location_url
-                         })
+    res, is_success = order.deserialize(request.get_json())
+    if is_success:
+        order.save()
+        message = order.serialize()
+        location_url = url_for('display_order', order_id=order.id, _external=True)
+        return make_response(jsonify(message), status.HTTP_201_CREATED,
+                             {
+                                 'Location': location_url
+                             })
+    else:
+        return make_response(jsonify(res), status.HTTP_400_BAD_REQUEST)
 
 
 ######################################################################
