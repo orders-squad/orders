@@ -137,6 +137,15 @@ class TestOrderServer(unittest.TestCase):
         self.assertEqual(len(data), order_count + 1)
         self.assertIn(new_json, data)
 
+    def test_create_bad_order(self):
+        """ Create a bad order """
+        bad_order = dict(prod_id=2, cust_id=2, price=19.2, status='refund_approved')
+        data = json.dumps(bad_order)
+        resp = self.client.post('/orders',
+                                data=data,
+                                content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_order(self):
         """ Update an existing order """
         order = Order.find_by_name('kindle')[0]

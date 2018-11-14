@@ -77,10 +77,10 @@ class Order(db.Model):
                                             prod_qty=item['prod_qty'],
                                             prod_price=float(item['prod_price']),
                                             status=item['status']))
-
         except KeyError as error:
             raise DataValidationError('Invalid order: missing ' + error.args[0])
         return self
+
 
     @staticmethod
     def init_db(app):
