@@ -29,12 +29,12 @@ Vagrant.configure(2) do |config|
   end
 
   # Copy your ssh keys for github so that your git credentials work
-  if File.exists?(File.expand_path("~/.ssh/id_rsa"))
-    config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-  end
-  if File.exists?(File.expand_path("~/.ssh/id_rsa.pub"))
-    config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-  end
+  # if File.exists?(File.expand_path("~/.ssh/id_rsa"))
+  #  config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
+  #  end
+  # if File.exists?(File.expand_path("~/.ssh/id_rsa.pub"))
+  #  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+ # end
 
   # Copy your IBM Clouid API Key if you have one
   if File.exists?(File.expand_path("~/.bluemix/apiKey.json"))
@@ -149,7 +149,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "docker" do |d|
       d.pull_images "postgres:11-alpine"
       d.run "postgres:11-alpine",
-        args: "--restart=always -d --name psql -h psql -p 5432:5432 -v /var/docker/postgresql:/data"
+        args: "--restart=always -d --name psql -h psql -p 5432:5432 -v /var/docker/postgresql:/data -e POSTGRES_PASSWORD=flaskrest02 -e POSTGRES_USER=flaskrest02 -e POSTGRES_DB=flaskrest02"
   end
 
 end
