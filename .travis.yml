@@ -6,10 +6,11 @@ services:
   - postgresql
 
 env:
-  - DB_NAME=flaskrest02
-  - DB_USER=postgres
-  - DB_PASS=
-  - DB_ADDR=127.0.0.1
+  global:
+    - DB_NAME=flaskrest02
+    - DB_USER=postgres
+    - DB_PASS=
+    - DB_ADDR=127.0.0.1
 
 # command to install dependencies
 install: "pip install -r requirements.txt"
