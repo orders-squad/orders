@@ -9,9 +9,15 @@ Test cases can be run with:
 import unittest
 import os
 from app.models import Order, OrderItem, DataValidationError, db
-from app import app
+from app import app, get_env_variable
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+
+DB_NAME = get_env_variable('DB_NAME')
+DB_USER = get_env_variable('DB_USER')
+DB_PASS = get_env_variable('DB_PASS')
+DB_ADDR = get_env_variable('DB_ADDR')
+
+DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=DB_USER,pw=DB_PASS,url=DB_ADDR,db=DB_NAME)
 
 ######################################################################
 #  T E S T   C A S E S
@@ -185,6 +191,12 @@ class TestOrders(unittest.TestCase):
         # self.assertRaises(DataValidationError, order.deserialize, data)
         res, is_success = order.deserialize(data)
         self.assertFalse(is_success)
+
+    def test_bad_env_variable(self):
+        """ Test non-existant env variable """
+        with self.assertRaises(Exception) as context:
+            get_env_variable("NOTHING")
+        self.assertTrue(context.exception)
 
     def test_find_by_order_id(self):
         """ Find an order by order ID """

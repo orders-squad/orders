@@ -2,8 +2,21 @@ language: python
 python:
   - "2.7"
 
+services:
+  - postgresql
+
+env:
+  global:
+    - DB_NAME=flaskrest02
+    - DB_USER=postgres
+    - DB_PASS=
+    - DB_ADDR=127.0.0.1
+
 # command to install dependencies
 install: "pip install -r requirements.txt"
+
+before_script:
+  - psql -c 'create database flaskrest02;' -U postgres
 
 # commands to run tests
 script:
@@ -11,3 +24,4 @@ script:
 
 after_success:
  - codecov
+

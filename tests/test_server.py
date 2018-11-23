@@ -9,7 +9,6 @@ Test cases can be run with the following:
 
 import unittest
 
-import os
 import json
 import logging
 from flask_api import status    # HTTP Status Codes
@@ -17,8 +16,16 @@ from mock import MagicMock, patch
 
 from app.models import Order, OrderItem, DataValidationError, db
 import app.service as service
+from app import get_env_variable
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+
+DB_NAME = get_env_variable('DB_NAME')
+DB_USER = get_env_variable('DB_USER')
+DB_PASS = get_env_variable('DB_PASS')
+DB_ADDR = get_env_variable('DB_ADDR')
+
+
+DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=DB_USER,pw=DB_PASS,url=DB_ADDR,db=DB_NAME)
 
 ######################################################################
 #  T E S T   C A S E S
