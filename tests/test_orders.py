@@ -192,6 +192,12 @@ class TestOrders(unittest.TestCase):
         res, is_success = order.deserialize(data)
         self.assertFalse(is_success)
 
+    def test_bad_env_variable(self):
+        """ Test non-existant env variable """
+        with self.assertRaises(Exception) as context:
+            get_env_variable("NOTHING")
+        self.assertTrue(context.exception)
+
     def test_find_by_order_id(self):
         """ Find an order by order ID """
         Order(cust_id=1).save()
