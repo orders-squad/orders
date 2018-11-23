@@ -9,7 +9,6 @@ Test cases can be run with the following:
 
 import unittest
 
-import os
 import json
 import logging
 from flask_api import status    # HTTP Status Codes
@@ -17,18 +16,7 @@ from mock import MagicMock, patch
 
 from app.models import Order, OrderItem, DataValidationError, db
 import app.service as service
-
-from dotenv import load_dotenv
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '../.env'))
-
-def get_env_variable(name):
-    try:
-        return os.environ[name]
-    except KeyError:
-        message = "Expected environment variable '{}' not set.".format(name)
-        raise Exception(message)
+from app import get_env_variable
 
 
 DB_NAME = get_env_variable('DB_NAME')

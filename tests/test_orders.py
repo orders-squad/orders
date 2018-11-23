@@ -9,20 +9,7 @@ Test cases can be run with:
 import unittest
 import os
 from app.models import Order, OrderItem, DataValidationError, db
-from app import app
-
-
-from dotenv import load_dotenv
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '../.env'))
-
-def get_env_variable(name):
-    try:
-        return os.environ[name]
-    except KeyError:
-        message = "Expected environment variable '{}' not set.".format(name)
-        raise Exception(message)
+from app import app, get_env_variable
 
 
 DB_NAME = get_env_variable('DB_NAME')
