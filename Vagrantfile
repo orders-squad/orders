@@ -57,7 +57,6 @@ Vagrant.configure(2) do |config|
     # Install app dependencies
     cd /vagrant
     sudo pip install -r requirements.txt
-<<<<<<< HEAD
   SHELL
 
   ######################################################################
@@ -98,8 +97,8 @@ Vagrant.configure(2) do |config|
     echo " For the Kubernetes Dashboard use:"
     echo " kubectl proxy --address='0.0.0.0'"
     echo "************************************\n"
-=======
->>>>>>> added postgress to vagrantfile
+
+  #added postgress to vagrantfile
   SHELL
 
   ######################################################################
@@ -142,7 +141,7 @@ Vagrant.configure(2) do |config|
     echo "************************************\n"
   SHELL
 
-    ######################################################################
+  ######################################################################
   # Postgres
   ######################################################################
 
