@@ -40,7 +40,7 @@ app = Flask(__name__)
 app.config.from_object('config')
 # Use Postgres
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'postgresql://{user}:{pw}@{url}/{db}'.format(user=DB_USER, pw=DB_PASS, url=DB_ADDR, db=DB_NAME)
+    'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=DB_USER, pw=DB_PASS, url=DB_ADDR, db=DB_NAME)
 
 
 import service
