@@ -96,8 +96,18 @@ class TestOrderServer(unittest.TestCase):
         """ Test the Home Page """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
-        self.assertEqual(data['name'], 'Order micro-service REST API Service')
+        # print(resp.data)
+        # Swagger takes care of the homepage(root url); hence
+        # the response data is a HTML doc instead of a json string
+        data = resp.data
+        self.assertIn('<!DOCTYPE html>', data)
+        self.assertIn('<title>Order REST API Service</title>', data)
+
+    def test_healthcheck_page(self):
+        """ Test the healthcheck page """
+        resp = self.client.get('/healthcheck')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn('Healthy', resp.data)
 
     def test_get_order_list(self):
         """ Get a list of Orders """
@@ -156,7 +166,7 @@ class TestOrderServer(unittest.TestCase):
     def test_update_order(self):
         """ Update an existing order """
         order = Order.find_by_name('kindle')[0]
-        print order.id
+        print(order.id)
         items = [{"prod_id": 1,
                   "prod_name": "kindle",
                   "prod_qty": 4,
@@ -180,6 +190,14 @@ class TestOrderServer(unittest.TestCase):
         print(new_json)
         self.assertEqual(len(new_json), 2)
         self.assertEqual(new_json[0]['cust_id'], 2)
+
+    def test_update_nonexist_order(self):
+        """ Update a non-existing order """
+        data = json.dumps({"cust_id": 2})
+        resp = self.client.put('/orders/{}'.format(9999),
+                               data=data,
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_order(self):
         """ Delete an Order that exists """

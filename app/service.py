@@ -30,13 +30,10 @@ api = Api(app,
           version='1.0.0',
           title='Order REST API Service',
           description='This is an order server.',
-          doc='/apidocs/'
+          doc='/'
           # prefix='/api'
          )
 
-
-# This namespace is the start of the path i.e., /orders
-ns = api.namespace('orders', description='order operations')
 
 # Define the model so that the docs reflect what can be sent
 order_model = api.model('Order', {
@@ -70,23 +67,15 @@ def request_validation_error(error):
 @app.route('/healthcheck')
 def healthcheck():
     """ Let them know our heart is still beating """
+    app.logger.info("healthcheck")
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
-
-
-######################################################################
-# GET INDEX
-######################################################################
-@app.route('/', methods=['GET'])
-def index():
-    """ Root URL response """
-    return jsonify(name='Order REST API Service'), status.HTTP_200_OK
 
 
 ######################################################################
 #  PATH: /orders/{id}
 ######################################################################
-@ns.route('/<int:order_id>')
-@ns.param('order_id', 'The order identifier')
+@api.route('/orders/<int:order_id>')
+@api.param('order_id', 'The order identifier')
 class OrderResource(Resource):
     """
     OrderResource class
@@ -96,12 +85,13 @@ class OrderResource(Resource):
     PUT /order{id} - Update an Order with the id
     DELETE /order{id} -  Deletes an Order with the id
     """
+
     # ------------------------------------------------------------------
     # RETRIEVE AN ORDER
     # ------------------------------------------------------------------
-    @ns.doc('get_order')
-    @ns.response(404, 'Order not found')
-    @ns.marshal_with(order_model)
+    @api.doc('get_order')
+    @api.response(404, 'Order not found')
+    @api.marshal_with(order_model)
     def get(self, order_id):
         """
         Retrieve a single Order
@@ -123,13 +113,13 @@ class OrderResource(Resource):
         return message, return_code
 
     # ------------------------------------------------------------------
-    # UPDATE AN EXISTING PET
+    # UPDATE AN EXISTING ORDER
     # ------------------------------------------------------------------
-    @ns.doc('Update_order')
-    @ns.response(404, 'Order not found')
-    @ns.response(400, 'The posted order data was not valid')
-    @ns.expect(order_model)
-    @ns.marshal_with(order_model)
+    @api.doc('Update_order')
+    @api.response(404, 'Order not found')
+    @api.response(400, 'The posted order data was not valid')
+    @api.expect(order_model)
+    @api.marshal_with(order_model)
     def put(self, order_id):
         """
         Update an Order
@@ -141,7 +131,6 @@ class OrderResource(Resource):
         order = Order.find(order_id)
         if not order:
             message = {'error': 'Order with id: %s was not found' % str(order_id)}
-            ## raise NotFound("Order with id '{}' was not found.".format(order_id))
             # return 404 instead of raising exceptions
             return_code = status.HTTP_404_NOT_FOUND
             return message, return_code
@@ -157,8 +146,8 @@ class OrderResource(Resource):
     # ------------------------------------------------------------------
     # DELETE AN ORDER
     # ------------------------------------------------------------------
-    @ns.doc('delete_orders')
-    @ns.response(204, 'Order deleted')
+    @api.doc('delete_orders')
+    @api.response(204, 'Order deleted')
     def delete(self, order_id):
         """
         Delete an Order
@@ -176,14 +165,14 @@ class OrderResource(Resource):
 ######################################################################
 #  PATH: /pets
 ######################################################################
-@ns.route('/', strict_slashes=False)
+@api.route('/orders', strict_slashes=False)
 class OrderCollection(Resource):
     """ Handles all interactions with collections of Orders """
     ######################################################################
     # LIST ALL ORDERS
     ######################################################################
-    @ns.doc('list_orders')
-    @ns.marshal_list_with(order_model)
+    @api.doc('list_orders')
+    @api.marshal_list_with(order_model)
     def get(self):
         """ Returns all of the Orders """
         app.logger.info('Request to list Orders...')
@@ -204,11 +193,11 @@ class OrderCollection(Resource):
     ######################################################################
     # ADD A NEW ORDER
     ######################################################################
-    @ns.doc('create_oders')
-    @ns.expect(order_model)
-    @ns.response(400, 'The posted data was not valid')
-    @ns.response(201, 'Order created successfully')
-    @ns.marshal_with(order_model, code=201)
+    @api.doc('create_oders')
+    @api.expect(order_model)
+    @api.response(400, 'The posted data was not valid')
+    @api.response(201, 'Order created successfully')
+    @api.marshal_with(order_model, code=201)
     def post(self):
         """
         Creates an Order
@@ -232,12 +221,12 @@ class OrderCollection(Resource):
 #  PATH: /orders/{id}/request-refund
 #  REQUEST A REFUND
 ######################################################################
-@ns.route('/<int:order_item_id>/request-refund')
-@ns.param('order_item_id', 'the order item id')
+@api.route('/orders/<int:order_item_id>/request-refund')
+@api.param('order_item_id', 'the order item id')
 class RequestRefundResource(Resource):
     """ Requests refund action on an Order"""
-    @ns.doc('request_refund')
-    @ns.response(404, 'Order item not found')
+    @api.doc('request_refund')
+    @api.response(404, 'Order item not found')
     def put(self, order_item_id):
         """
         Request a refund of an order
@@ -260,12 +249,12 @@ class RequestRefundResource(Resource):
 #  PATH: /orders/{id}/approve-refund
 #  APPROVE A REFUND
 ######################################################################
-@ns.route('/<int:order_item_id>/approve-refund')
-@ns.param('order_item_id', 'The order item identifier')
+@api.route('/orders/<int:order_item_id>/approve-refund')
+@api.param('order_item_id', 'The order item identifier')
 class ApproveRefundResource(Resource):
     """ Approve refund """
-    @ns.doc('approve_refund')
-    @ns.response(404, 'Order item not found')
+    @api.doc('approve_refund')
+    @api.response(404, 'Order item not found')
     def put(self, order_item_id):
         """
         Approve a refund of an order
@@ -288,12 +277,12 @@ class ApproveRefundResource(Resource):
 #  PATH: /orders/{id}/deny-refund
 #  DENY A REFUND
 ######################################################################
-@ns.route('/<int:order_item_id>/deny-refund')
-@ns.param('order_item_id', 'The order item identifier')
+@api.route('/orders/<int:order_item_id>/deny-refund')
+@api.param('order_item_id', 'The order item identifier')
 class DenyRefundResource(Resource):
     """ Deny refund """
-    @ns.doc('deny_refund')
-    @ns.response(404, 'Order item not found')
+    @api.doc('deny_refund')
+    @api.response(404, 'Order item not found')
     def put(self, order_item_id):
         """
         Deny a refund of an order

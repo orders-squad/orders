@@ -19,4 +19,4 @@ if __name__ == "__main__":
     print "****************************************"
     service.initialize_logging()
     service.init_db()  # make our sqlalchemy tables
-    app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)
+    app.run(host='0.0.0.0', port=int(PORT), debug=True)
