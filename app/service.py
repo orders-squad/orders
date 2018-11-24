@@ -1,5 +1,5 @@
 """
-Order Store Service(Adapted from Professor Rofrano's template
+Order Service(Adapted from Professor Rofrano's template
 
 Paths:
 ------
@@ -16,6 +16,7 @@ import logging
 import simplejson as json
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
+from flask_restplus import Api, Resource, fields
 from werkzeug.exceptions import NotFound
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
@@ -27,193 +28,312 @@ from models import Order, DataValidationError
 from . import app
 
 
+
+######################################################################
+# Configure Swagger before initilaizing it
+######################################################################
+api = Api(app,
+          version='1.0.0',
+          title='Order REST API Service',
+          description='This is an order server.',
+          doc='/apidocs/'
+          # prefix='/api'
+         )
+
+
+# This namespace is the start of the path i.e., /orders
+ns = api.namespace('orders', description='order operations')
+
+# Define the model so that the docs reflect what can be sent
+order_model = api.model('Order', {
+    'id': fields.Integer(readOnly=True,
+                         description='The unique id assigned internally by service'),
+    'cust_id': fields.Integer(required=True,
+                          description='The customer ID of the Order'),
+    # 'Items': fields.Relationship(required=True,
+    #                           description='The items in this order'),
+    # 'Created on': fields.Datetime(required=False,
+    #                             description='Create time of the order'),
+    # 'Updated on': fields.Datetime(required=False,
+    #                             description='Update time of the order')
+})
+
+
+######################################################################
+# Special Error Handlers
+######################################################################
+@api.errorhandler(DataValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return {'status':400, 'error': 'Bad Request', 'message': message}, 400
+
+# @api.errorhandler(DatabaseConnectionError)
+# def database_connection_error(error):
+#     """ Handles Database Errors from connection attempts """
+#     message = error.message or str(error)
+#     app.logger.critical(message)
+#     return {'status':500, 'error': 'Server Error', 'message': message}, 500
+
+######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route('/healthcheck')
+def healthcheck():
+    """ Let them know our heart is still beating """
+    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+
+
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     """ Root URL response """
-    return jsonify(name='Order micro-service REST API Service',
-                   version='1.0',
-                   paths=url_for('list_orders', _external=True)
-                   ), status.HTTP_200_OK
+    return make_response(jsonify(name='Order REST API Service',
+                                 doc=url_for('doc', _external=True)
+                                 ), status.HTTP_200_OK)
 
-
-######################################################################
-# LIST ALL ORDERS
-######################################################################
-
-@app.route('/orders', methods=['GET'])
-def list_orders():
-    """ Returns all of the Orders """
-    orders = []
-    cust_id = request.args.get('cust_id')
-    name = request.args.get('prod_name')
-    if cust_id:
-        orders = Order.find_by_cust_id(cust_id)
-    elif name:
-        orders = Order.find_by_name(name)
-    else:
-        orders = Order.all()
-
-    results = [order.serialize() for order in orders]
-    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
-# ADD A NEW ORDER
+#  PATH: /orders/{id}
 ######################################################################
-@app.route('/orders', methods=['POST'])
-def create_orders():
+@ns.route('/<int:order_id>')
+@ns.param('order_id', 'The order identifier')
+class OrderResource(Resource):
     """
-    Creates an Order
-    This endpoint will create an Order based the data in the body that is posted
+    OrderResource class
+
+    Allows the manipulation of a single Order
+    GET /order{id} - Returns an Order with the id
+    PUT /order{id} - Update an Order with the id
+    DELETE /order{id} -  Deletes an Order with the id
     """
-    check_content_type('application/json')
-    order = Order()
-    res, is_success = order.deserialize(request.get_json())
-    if is_success:
+    # ------------------------------------------------------------------
+    # RETRIEVE AN ORDER
+    # ------------------------------------------------------------------
+    @ns.doc('get_order')
+    @ns.response(404, 'Order not found')
+    @ns.marshal_with(order_model)
+    def get(self, order_id):
+        """
+        Retrieve a single Order
+
+        This endpoint will return an Order based on it's id
+        :param order_id:
+        :return:
+        """
+        app.logger.info('Finding an order with id [{}]'.format(order_id))
+        order = Order.find(order_id)
+
+        if order:
+            message = order.serialize()
+            return_code = status.HTTP_200_OK
+        else:
+            message = {'error': 'Order with id: %s was not found' % str(order_id)}
+            return_code = status.HTTP_404_NOT_FOUND
+
+        return message, return_code
+
+    # ------------------------------------------------------------------
+    # UPDATE AN EXISTING PET
+    # ------------------------------------------------------------------
+    @ns.doc('Update_order')
+    @ns.response(404, 'Order not found')
+    @ns.response(400, 'The posted order data was not valid')
+    @ns.expect(order_model)
+    @ns.marshal_with(order_model)
+    def put(self, order_id):
+        """
+        Update an Order
+
+        This endpoint will update an Order based the body that is posted
+        """
+        app.logger.info('Request to Update an Order with id [%s]', order_id)
+        check_content_type('application/json')
+        order = Order.find(order_id)
+        if not order:
+            message = {'error': 'Order with id: %s was not found' % str(order_id)}
+            ## raise NotFound("Order with id '{}' was not found.".format(order_id))
+            # return 404 instead of raising exceptions
+            return_code = status.HTTP_404_NOT_FOUND
+            return message, return_code
+
+        # print request.get_json()
+        data = api.payload
+        app.logger.info(data)
+        order.deserialize(data)
+        order.id = order_id
         order.save()
-        message = order.serialize()
-        location_url = url_for('display_order', order_id=order.id, _external=True)
-        return make_response(jsonify(message), status.HTTP_201_CREATED,
-                             {
-                                 'Location': location_url
-                             })
-    else:
-        return make_response(jsonify(res), status.HTTP_400_BAD_REQUEST)
-
-
-######################################################################
-# UPDATE AN EXISTING ORDER
-######################################################################
-@app.route('/orders/<int:order_id>', methods=['PUT'])
-def update_orders(order_id):
-    """
-    Update an Order
-
-    This endpoint will update an Order based the body that is posted
-    """
-    check_content_type('application/json')
-    order = Order.find(order_id)
-    if not order:
-        raise NotFound("Order with id '{}' was not found.".format(order_id))
-    print request.get_json()
-    order.deserialize(request.get_json())
-    order.id = order_id
-    order.save()
-    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
-
-
-######################################################################
-# DELETE AN EXISTING ORDER
-######################################################################
-
-@app.route('/orders/<int:order_id>', methods=['DELETE'])
-def delete_order(order_id):
-    """
-    Delete an Order
-    This endpoint will delete an Order based the body that is posted
-    """
-    check_content_type('application/json')
-    order = Order.find(order_id)
-    if order:
-        order.delete()
-    return make_response('', status.HTTP_204_NO_CONTENT)
-
-    
-######################################################################
-# REQUEST A REFUND
-######################################################################
-@app.route('/orders/<int:order_item_id>/request-refund', methods=['PUT'])
-def request_refund(order_item_id):
-    """
-    Request a refund of an order
-
-    This endpoint will request a refund of an Order based the id specified in the path
-    """
-    order_item = Order.find_by_order_item_id(order_item_id)
-    Order.logger.info(order_item)
-    if not order_item:
-        raise NotFound("Order item id '{}' was not found.".format(order_item_id))
-    order_item.status = "refund_requested"
-    order = Order.find(order_item.order_id)
-    order.save()
-    Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
-    return make_response(jsonify(order_item.serialize()), status.HTTP_200_OK)
-
-
-######################################################################
-# APPROVE A REFUND
-######################################################################
-@app.route('/orders/<int:order_item_id>/approve-refund', methods=['PUT'])
-def approve_refund(order_item_id):
-    """
-    Approve a refund of an order
-
-    This endpoint will approve a refund of an Order based the id specified in the path
-    """
-
-    order_item = Order.find_by_order_item_id(order_item_id)
-    Order.logger.info(order_item)
-    if not order_item:
-        raise NotFound("Order item id '{}' was not found.".format(order_item_id))
-    order_item.status = "refund_approved"
-    order = Order.find(order_item.order_id)
-    order.save()
-    Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
-    return make_response(jsonify(order_item.serialize()), status.HTTP_200_OK)
-
-
-
-
-
-######################################################################
-# DENY A REFUND
-######################################################################
-@app.route('/orders/<int:order_item_id>/deny-refund', methods=['PUT'])
-def deny_refund(order_item_id):
-    """
-    Deny a refund of an order
-
-    This endpoint will deny a refund of an Order based the id specified in the path
-    """
-
-    order_item = Order.find_by_order_item_id(order_item_id)
-    Order.logger.info(order_item)
-    if not order_item:
-        raise NotFound("Order item id '{}' was not found.".format(order_item_id))
-    order_item.status = "refund_denied"
-    order = Order.find(order_item.order_id)
-    order.save()
-    Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
-    return make_response(jsonify(order_item.serialize()), status.HTTP_200_OK)
-
-
-
-######################################################################
-# DISPLAY AN ORDER
-######################################################################
-@app.route('/orders/<int:order_id>', methods=['GET'])
-def display_order(order_id):
-    """ Retrieve an order with specific id """
-    app.logger.info('Finding an order with id [{}]'.format(order_id))
-    order = Order.find(order_id)
-    
-    if order:
-        message = order.serialize()
+        message = order.deserialize()
         return_code = status.HTTP_200_OK
-    else:
-        message = {'error': 'Order with id: %s was not found' % str(order_id)}
-        return_code = status.HTTP_404_NOT_FOUND
+        return message, return_code
 
-    return make_response(jsonify(message), return_code)
+    # ------------------------------------------------------------------
+    # DELETE AN ORDER
+    # ------------------------------------------------------------------
+    @ns.doc('delete_orders')
+    @ns.response(204, 'Order deleted')
+    def delete(self, order_id):
+        """
+        Delete an Order
+
+        This endpoint will delete an Order based the body that is posted
+        """
+        app.logger.info("Request to Delete a pet with id [%s]", order_id)
+        # check_content_type('application/json')
+        order = Order.find(order_id)
+        if order:
+            order.delete()
+        return '', status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+#  PATH: /pets
+######################################################################
+@ns.route('/', strict_slashes=False)
+class OrderCollection(Resource):
+    """ Handles all interactions with collections of Orders """
+    ######################################################################
+    # LIST ALL ORDERS
+    ######################################################################
+    @ns.doc('list_orders')
+    @ns.marshal_list_with(order_model)
+    def get(self):
+        """ Returns all of the Orders """
+        app.logger.info('Request to list Orders...')
+        orders = []
+        cust_id = request.args.get('cust_id')
+        name = request.args.get('prod_name')
+        if cust_id:
+            orders = Order.find_by_cust_id(cust_id)
+        elif name:
+            orders = Order.find_by_name(name)
+        else:
+            orders = Order.all()
+
+        app.logger.info('[%s] Orders returned', len(orders))
+        results = [order.serialize() for order in orders]
+        return results, status.HTTP_200_OK
+
+    ######################################################################
+    # ADD A NEW ORDER
+    ######################################################################
+    @ns.doc('create_oders')
+    @ns.expect(order_model)
+    @ns.response(400, 'The posted data was not valid')
+    @ns.response(201, 'Order created successfully')
+    @ns.marshal_with(order_model, code=201)
+    def post(self):
+        """
+        Creates an Order
+        This endpoint will create an Order based the data in the body that is posted
+        """
+        app.logger.info('Request to create an Order')
+        check_content_type('application/json')
+        order = Order()
+        res, is_success = order.deserialize(api.payload)
+        if is_success:
+            order.save()
+            app.logger.info('Order with new id [%s] saved!', order.id)
+            message = order.serialize()
+            location_url = api.url_for(OrderResource, order_id=order.id, _external=True)
+            return order.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
+        else:
+            return jsonify(res), status.HTTP_400_BAD_REQUEST
+
+
+######################################################################
+#  PATH: /orders/{id}/request-refund
+#  REQUEST A REFUND
+######################################################################
+@ns.route('/orders/<int:order_item_id>/request-refund')
+@ns.param('order_item_id', 'the order item id')
+class RequestRefundResource(Resource):
+    """ Requests refund action on an Order"""
+    @ns.doc('request_refund')
+    @ns.response(404, 'Order item not found')
+    def put(self, order_item_id):
+        """
+        Request a refund of an order
+
+        This endpoint will request a refund of an Order based the id specified in the path
+        """
+        order_item = Order.find_by_order_item_id(order_item_id)
+        app.logger.info('Request to refund an Order item')
+        app.logger.info(order_item)
+        if not order_item:
+            abort(status.HTTP_404_NOT_FOUND, "Order item id '{}' was not found.".format(order_item_id))
+        order_item.status = "refund_requested"
+        order = Order.find(order_item.order_id)
+        order.save()
+        Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+        return order_item.serialize(), status.HTTP_200_OK
+
+
+######################################################################
+#  PATH: /orders/{id}/approve-refund
+#  APPROVE A REFUND
+######################################################################
+@ns.route('/orders/<int:order_item_id>/approve-refund')
+@ns.param('order_item_id', 'The order item identifier')
+class ApproveRefundResource(Resource):
+    """ Approve refund """
+    @ns.doc('approve_refund')
+    @ns.response(404, 'Order item not found')
+    def put(self, order_item_id):
+        """
+        Approve a refund of an order
+
+        This endpoint will approve a refund of an Order based the id specified in the path
+        """
+
+        order_item = Order.find_by_order_item_id(order_item_id)
+        Order.logger.info(order_item)
+        if not order_item:
+            abort(status.HTTP_404_NOT_FOUND, "Order item id [{}] was not found.".format(order_item_id))
+        order_item.status = "refund_approved"
+        order = Order.find(order_item.order_id)
+        order.save()
+        Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+        return order_item.serialize(), status.HTTP_200_OK
+
+
+######################################################################
+#  PATH: /orders/{id}/deny-refund
+#  DENY A REFUND
+######################################################################
+@ns.route('/orders/<int:order_item_id>/deny-refund')
+@ns.param('order_item_id', 'The order item identifier')
+class DenyRefundResource(Resource):
+    """ Deny refund """
+    @ns.doc('deny_refund')
+    @ns.response(404, 'Order item not found')
+    def deny_refund(self, order_item_id):
+        """
+        Deny a refund of an order
+
+        This endpoint will deny a refund of an Order based the id specified in the path
+        """
+
+        order_item = Order.find_by_order_item_id(order_item_id)
+        Order.logger.info(order_item)
+        if not order_item:
+            abort(status.HTTP_404_NOT_FOUND, "Order item id '{}' was not found.".format(order_item_id))
+        order_item.status = "refund_denied"
+        order = Order.find(order_item.order_id)
+        order.save()
+        Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+        return order_item.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
+@app.before_first_request
 def init_db():
     """ Initialies the SQLAlchemy app """
     global app

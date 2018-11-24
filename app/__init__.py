@@ -13,12 +13,26 @@ from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '../.env'))
 
+# POSTGRES = {
+#             'DB_NAME': 'yyqdmnta',
+#             'DB_USER': 'yyqdmnta',
+#             'DB_PASS': 'DAjp_tJnsyg2gk5zjRvUFhxa4TwMP4hQ',
+#             'DB_ADDR': 'pellefant.db.elephantsql.com :5432',
+#             }
+POSTGRES = {
+    'DB_NAME': 'flaskrest02',
+    'DB_USER': 'flaskrest02',
+    'DB_PASS': 'flaskrest02',
+    'DB_ADDR': 'localhost:5432',
+}
+
 def get_env_variable(name):
     try:
         return os.environ[name]
     except KeyError:
-        message = "Expected environment variable '{}' not set.".format(name)
-        raise Exception(message)
+        # message = "Expected environment variable '{}' not set.".format(name)
+        return POSTGRES[name]
+        # raise Exception(message)
 
 
 DB_NAME = get_env_variable('DB_NAME')
@@ -29,7 +43,7 @@ DB_ADDR = get_env_variable('DB_ADDR')
 # Create Flask application
 app = Flask(__name__)
 # We'll just use SQLite here so we don't need an external database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=DB_USER,pw=DB_PASS,url=DB_ADDR,db=DB_NAME)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{user}:{pw}@{url}/{db}'.format(user=DB_USER,pw=DB_PASS,url=DB_ADDR,db=DB_NAME)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'please, tell nobody... Shhhh'
