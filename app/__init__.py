@@ -14,20 +14,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '../.env'))
 
 
-POSTGRES = {
-    'DB_NAME': 'flaskrest02',
-    'DB_USER': 'flaskrest02',
-    'DB_PASS': 'flaskrest02',
-    'DB_ADDR': 'localhost:5432',
-}
-
-
 def get_env_variable(name):
     try:
         return os.environ[name]
     except KeyError:
-        # message = "Expected environment variable '{}' not set.".format(name)
-        return POSTGRES[name]
+        message = "Expected environment variable '{}' not set.".format(name)
+        raise Exception(message)
 
 
 DB_NAME = get_env_variable('DB_NAME')
