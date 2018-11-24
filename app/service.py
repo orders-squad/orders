@@ -161,13 +161,11 @@ class OrderResource(Resource):
             return_code = status.HTTP_404_NOT_FOUND
             return message, return_code
 
-        # print request.get_json()
         data = api.payload
         app.logger.info(data)
-        order.deserialize(data)
+        message = order.deserialize(data)
         order.id = order_id
         order.save()
-        message = order.deserialize()
         return_code = status.HTTP_200_OK
         return message, return_code
 
@@ -214,8 +212,8 @@ class OrderCollection(Resource):
         else:
             orders = Order.all()
 
-        app.logger.info('[%s] Orders returned', len(orders))
         results = [order.serialize() for order in orders]
+        app.logger.info('[%s] Orders returned', len(results))
         return results, status.HTTP_200_OK
 
     ######################################################################
@@ -249,7 +247,7 @@ class OrderCollection(Resource):
 #  PATH: /orders/{id}/request-refund
 #  REQUEST A REFUND
 ######################################################################
-@ns.route('/orders/<int:order_item_id>/request-refund')
+@ns.route('/<int:order_item_id>/request-refund')
 @ns.param('order_item_id', 'the order item id')
 class RequestRefundResource(Resource):
     """ Requests refund action on an Order"""
@@ -277,7 +275,7 @@ class RequestRefundResource(Resource):
 #  PATH: /orders/{id}/approve-refund
 #  APPROVE A REFUND
 ######################################################################
-@ns.route('/orders/<int:order_item_id>/approve-refund')
+@ns.route('/<int:order_item_id>/approve-refund')
 @ns.param('order_item_id', 'The order item identifier')
 class ApproveRefundResource(Resource):
     """ Approve refund """
@@ -305,7 +303,7 @@ class ApproveRefundResource(Resource):
 #  PATH: /orders/{id}/deny-refund
 #  DENY A REFUND
 ######################################################################
-@ns.route('/orders/<int:order_item_id>/deny-refund')
+@ns.route('/<int:order_item_id>/deny-refund')
 @ns.param('order_item_id', 'The order item identifier')
 class DenyRefundResource(Resource):
     """ Deny refund """

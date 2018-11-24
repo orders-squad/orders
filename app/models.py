@@ -13,7 +13,9 @@ Attributes:
 
 """
 import logging
+import json
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 
 # Create the SQLAlchemy object to be initialized later in init_db()
@@ -121,6 +123,14 @@ class Order(db.Model):
         return Order.query.filter(Order.cust_id == cust_id)
 
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
+
+
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
@@ -142,6 +152,6 @@ class OrderItem(db.Model):
             "prod_qty": self.prod_qty,
             "prod_price": self.prod_price,
             "status": self.status,
-            "created_on": self.created_on,
-            "updated_on": self.updated_on
+            "created_on": json.dumps(self.created_on, cls=DateTimeEncoder),
+            "updated_on": json.dumps(self.updated_on, cls=DateTimeEncoder)
         }

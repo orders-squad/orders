@@ -13,12 +13,7 @@ from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '../.env'))
 
-# POSTGRES = {
-#             'DB_NAME': 'yyqdmnta',
-#             'DB_USER': 'yyqdmnta',
-#             'DB_PASS': 'DAjp_tJnsyg2gk5zjRvUFhxa4TwMP4hQ',
-#             'DB_ADDR': 'pellefant.db.elephantsql.com :5432',
-#             }
+
 POSTGRES = {
     'DB_NAME': 'flaskrest02',
     'DB_USER': 'flaskrest02',
