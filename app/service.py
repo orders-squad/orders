@@ -18,15 +18,9 @@ from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from flask_restplus import Api, Resource, fields
 from werkzeug.exceptions import NotFound
-
-# For this example we'll use SQLAlchemy, a popular ORM that supports a
-# variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from models import Order, DataValidationError
-
-# Import Flask application
+from app.models import Order, OrderItem, DataValidationError
 from . import app
-
 
 
 ######################################################################
@@ -49,13 +43,7 @@ order_model = api.model('Order', {
     'id': fields.Integer(readOnly=True,
                          description='The unique id assigned internally by service'),
     'cust_id': fields.Integer(required=True,
-                          description='The customer ID of the Order'),
-    # 'Items': fields.Relationship(required=True,
-    #                           description='The items in this order'),
-    # 'Created on': fields.Datetime(required=False,
-    #                             description='Create time of the order'),
-    # 'Updated on': fields.Datetime(required=False,
-    #                             description='Update time of the order')
+                          description='The customer ID of the Order')
 })
 
 
@@ -91,10 +79,7 @@ def healthcheck():
 @app.route('/', methods=['GET'])
 def index():
     """ Root URL response """
-    return make_response(jsonify(name='Order REST API Service',
-                                 doc=url_for('doc', _external=True)
-                                 ), status.HTTP_200_OK)
-
+    return jsonify(name='Order REST API Service'), status.HTTP_200_OK
 
 
 ######################################################################
@@ -309,7 +294,7 @@ class DenyRefundResource(Resource):
     """ Deny refund """
     @ns.doc('deny_refund')
     @ns.response(404, 'Order item not found')
-    def deny_refund(self, order_item_id):
+    def put(self, order_item_id):
         """
         Deny a refund of an order
 
@@ -334,7 +319,7 @@ class DenyRefundResource(Resource):
 @app.before_first_request
 def init_db():
     """ Initialies the SQLAlchemy app """
-    global app
+    # global app
     Order.init_db(app)
 
 

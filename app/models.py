@@ -42,7 +42,6 @@ class Order(db.Model):
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
     items = db.relationship('OrderItem', backref='order', lazy='dynamic')
 
-
     def __repr__(self):
         # return '<Order %r>' % (self.name)
         return str(self.serialize())

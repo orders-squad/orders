@@ -37,21 +37,20 @@ DB_ADDR = get_env_variable('DB_ADDR')
 
 # Create Flask application
 app = Flask(__name__)
-# We'll just use SQLite here so we don't need an external database
+app.config.from_object('config')
+# Use Postgres
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{user}:{pw}@{url}/{db}'.format(user=DB_USER,pw=DB_PASS,url=DB_ADDR,db=DB_NAME)
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'please, tell nobody... Shhhh'
-app.config['LOGGING_LEVEL'] = logging.INFO
 
 import service
+import models
 
-# Set up logging for production
-print 'Setting up logging for {}...'.format(__name__)
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    if gunicorn_logger:
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.setLevel(gunicorn_logger.level)
-
-app.logger.info('Logging established')
+# # Set up logging for production
+# print 'Setting up logging for {}...'.format(__name__)
+# if __name__ != '__main__':
+#     gunicorn_logger = logging.getLogger('gunicorn.error')
+#     if gunicorn_logger:
+#         app.logger.handlers = gunicorn_logger.handlers
+#         app.logger.setLevel(gunicorn_logger.level)
+#
+# app.logger.info('Logging established')

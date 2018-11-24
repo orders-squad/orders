@@ -170,7 +170,7 @@ class TestOrderServer(unittest.TestCase):
                   "status": "ordered"
                   }
                  ]
-        new_order = {"cust_id": 2, "items": []}
+        new_order = {"cust_id": 2, "items": items}
         data = json.dumps(new_order)
         resp = self.client.put('/orders/{}'.format(order.id),
                                data=data,
@@ -178,7 +178,8 @@ class TestOrderServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         print(new_json)
-        self.assertEqual(new_json['cust_id'], 2)
+        self.assertEqual(len(new_json), 2)
+        self.assertEqual(new_json[0]['cust_id'], 2)
 
     def test_delete_order(self):
         """ Delete an Order that exists """
