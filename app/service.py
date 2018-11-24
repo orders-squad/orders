@@ -47,12 +47,12 @@ order_model = api.model('Order', {
 ######################################################################
 # Special Error Handlers
 ######################################################################
-@api.errorhandler(DataValidationError)
-def request_validation_error(error):
-    """ Handles Value Errors from bad data """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return {'status':400, 'error': 'Bad Request', 'message': message}, 400
+# @api.errorhandler(DataValidationError)
+# def request_validation_error(error):
+#     """ Handles Value Errors from bad data """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return {'status':400, 'error': 'Bad Request', 'message': message}, 400
 
 # @api.errorhandler(DatabaseConnectionError)
 # def database_connection_error(error):
