@@ -11,9 +11,15 @@ applications:
   path: .
   disk_quota: 1024M
   buildpack: python_buildpack
-  command: gunicorn --bind=0.0.0.0:$PORT service:app
+  
   services:
-  - Cloudant
+  - PostgreSQL
   env:
     FLASK_APP : server
     FLASK_DEBUG : false
+    DB_NAME: compose
+    DB_USER: admin
+    DB_PASS: INHWLZBYUWGHWNVO
+    DB_ADDR: sl-us-south-1-portal.43.dblayer.com:16139
+    #SQLALCHEMY_DATABASE_URI: postgres://admin:INHWLZBYUWGHWNVO@sl-us-south-1-portal.43.dblayer.com:16139/compose
+

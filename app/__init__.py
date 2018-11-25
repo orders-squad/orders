@@ -32,18 +32,32 @@ app = Flask(__name__)
 app.config.from_object('config')
 # Use Postgres
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=DB_USER, pw=DB_PASS, url=DB_ADDR, db=DB_NAME)
+    'postgres://{user}:{pw}@{url}/{db}'.format(user=DB_USER, pw=DB_PASS, url=DB_ADDR, db=DB_NAME)
 
 
 import service
 import models
 
-# # Set up logging for production
-print 'Setting up logging for {}...'.format(__name__)
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    if gunicorn_logger:
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.setLevel(gunicorn_logger.level)
+'''# # Set up logging for production 
+print 'Setting up logging for {}...'.format(__name__) 
+if __name__ != '__main__': 
+    gunicorn_logger = logging.getLogger('gunicorn.error') 
+    if gunicorn_logger: 
+        app.logger.handlers = gunicorn_logger.handlers 
+        app.logger.setLevel(gunicorn_logger.level) 
+ app.logger.info('Logging established')'''
 
-app.logger.info('Logging established')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
