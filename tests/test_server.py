@@ -293,6 +293,10 @@ class TestOrderServer(unittest.TestCase):
                                 data=data)
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_data_reset(self):
+        service.data_reset()
+        self.assertEqual(len(Order.all()), 0)
+
     # @patch('app.service.Order.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
