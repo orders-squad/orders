@@ -34,13 +34,25 @@ api = Api(app,
           # prefix='/api'
          )
 
+OrderItemFields = api.model('OrderItem', {
+    "id": fields.Integer,
+    "order_id": fields.Integer,
+    "prod_id": fields.Integer,
+    "prod_name": fields.String,
+    "prod_qty": fields.Integer,
+    "prod_price": fields.Float,
+    "status": fields.String,
+})
 
 # Define the model so that the docs reflect what can be sent
 order_model = api.model('Order', {
     'id': fields.Integer(readOnly=True,
                          description='The unique id assigned internally by service'),
     'cust_id': fields.Integer(required=True,
-                          description='The customer ID of the Order')
+                          description='The customer ID of the Order'),
+    'items': fields.List(fields.Nested(OrderItemFields),
+                         required=True,
+                         description='The items in this order'),
 })
 
 
