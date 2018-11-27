@@ -208,6 +208,14 @@ class TestOrders(unittest.TestCase):
         self.assertEqual(order.id, cake.id)
         self.assertEqual(order.cust_id, 1)
 
+    def test_find_or_404(self):
+        """ Find an order or 404 """
+        Order(cust_id=1).save()
+        cake = Order(cust_id=1)
+        cake.save()
+        order = Order.find_or_404(cake.id)
+        self.assertEqual(order.id, cake.id)
+
     def test_find_by_cust_id(self):
         """ Find Orders by customer id """
         Order(cust_id=1).save()
