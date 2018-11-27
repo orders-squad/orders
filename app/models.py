@@ -40,7 +40,7 @@ class Order(db.Model):
     cust_id = db.Column(db.Integer)
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
-    items = db.relationship('OrderItem', backref='order', lazy='dynamic')
+    items = db.relationship('OrderItem', backref='order', lazy='dynamic', passive_deletes=True)
 
     def __repr__(self):
         # return '<Order %r>' % (self.name)
@@ -121,6 +121,13 @@ class Order(db.Model):
         Order.logger.info('Processing customer id query for %s ...', cust_id)
         return Order.query.filter(Order.cust_id == cust_id)
 
+    @staticmethod
+    def remove_all():
+        """ Remove all orders from the database """
+        rows_deleted = Order.query.delete()
+        # db.session.commit()
+        Order.logger.info("Deleted %d rows", rows_deleted)
+
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
@@ -132,7 +139,7 @@ class DateTimeEncoder(json.JSONEncoder):
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id', ondelete='CASCADE'))
     prod_id = db.Column(db.Integer)
     prod_name = db.Column(db.String(63))
     prod_qty = db.Column(db.Integer)

@@ -323,6 +323,8 @@ def init_db():
     # global app
     Order.init_db(app)
 
+def data_reset():
+    Order.remove_all()
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """

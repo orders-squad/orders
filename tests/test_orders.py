@@ -275,6 +275,11 @@ class TestOrders(unittest.TestCase):
         self.assertEqual(orders[0].items[1].prod_id, 2)
         self.assertEqual(orders[0].items[1].prod_price, 199)
 
+    def test_remove_all(self):
+        """ Remove all orders """
+        Order.remove_all()
+        self.assertEqual(len(Order.all()), 0)
+
 
 ######################################################################
 #   M A I N
