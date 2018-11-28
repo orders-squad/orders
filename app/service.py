@@ -30,7 +30,7 @@ api = Api(app,
           version='1.0.0',
           title='Order REST API Service',
           description='This is an order server.',
-          doc='/'
+          doc='/apidoc'
           # prefix='/api'
          )
 
