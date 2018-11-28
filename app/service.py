@@ -314,6 +314,16 @@ class DenyRefundResource(Resource):
 
 
 ######################################################################
+# DELETE ALL PET DATA (Danger! For testing only)
+######################################################################
+
+@app.route('/orders/reset', methods=['DELETE'])
+def orders_reset():
+    """ Removes all orders from the database """
+    data_reset()
+    return make_response('', status.HTTP_204_NO_CONTENT)
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 

@@ -294,7 +294,13 @@ class TestOrderServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_data_reset(self):
+        """ test reset data """
         service.data_reset()
+        self.assertEqual(len(Order.all()), 0)
+
+    def test_orders_reset(self):
+        """ test delete all orders from database """
+        service.orders_reset()
         self.assertEqual(len(Order.all()), 0)
 
     # @patch('app.service.Order.find_by_name')
