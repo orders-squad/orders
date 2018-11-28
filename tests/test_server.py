@@ -219,8 +219,13 @@ class TestOrderServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['cust_id'], 1)
-        
-        
+
+    def test_query_order_list_by_prod_name(self):
+        """ Query Orders by product name """
+        resp = self.client.get('/orders',
+                               query_string='prod_name=kindle')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
     def test_request_refund(self):
         """ Request a refund """
         resp = self.client.put('/orders/1/request-refund')
@@ -287,6 +292,16 @@ class TestOrderServer(unittest.TestCase):
         resp = self.client.post('/orders',
                                 data=data)
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_data_reset(self):
+        """ test reset data """
+        service.data_reset()
+        self.assertEqual(len(Order.all()), 0)
+
+    def test_orders_reset(self):
+        """ test delete all orders from database """
+        service.orders_reset()
+        self.assertEqual(len(Order.all()), 0)
 
     # @patch('app.service.Order.find_by_name')
     # def test_bad_request(self, bad_request_mock):

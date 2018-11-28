@@ -208,6 +208,15 @@ class TestOrders(unittest.TestCase):
         self.assertEqual(order.id, cake.id)
         self.assertEqual(order.cust_id, 1)
 
+    def test_find_or_404(self):
+        """ Find an order or 404 """
+        Order(cust_id=1).save()
+        cake = Order(cust_id=1)
+        cake.save()
+        order = Order.find_or_404(cake.id)
+        self.assertEqual(order.id, cake.id)
+        self.assertEqual(order.cust_id, 1)
+
     def test_find_by_cust_id(self):
         """ Find Orders by customer id """
         Order(cust_id=1).save()
@@ -274,6 +283,11 @@ class TestOrders(unittest.TestCase):
         self.assertEqual(orders[0].cust_id, 1)
         self.assertEqual(orders[0].items[1].prod_id, 2)
         self.assertEqual(orders[0].items[1].prod_price, 199)
+
+    def test_remove_all(self):
+        """ Remove all orders """
+        Order.remove_all()
+        self.assertEqual(len(Order.all()), 0)
 
 
 ######################################################################
