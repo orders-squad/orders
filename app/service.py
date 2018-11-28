@@ -314,7 +314,7 @@ class DenyRefundResource(Resource):
 
 
 ######################################################################
-# DELETE ALL PET DATA (Danger! For testing only)
+# DELETE ALL ORDERS DATA (Danger! For testing only)
 ######################################################################
 
 @app.route('/orders/reset', methods=['DELETE'])
