@@ -125,6 +125,17 @@ Vagrant.configure(2) do |config|
     sudo chown vagrant:vagrant /opt/couchdb/data
   SHELL
 
+  ######################################################################
+  # Create .env file
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "Creating /vagrant/.env"
+    sudo rm -rf /vagrant/.env
+    sudo touch /vagrant .env
+    sudo chown vagrant:vagrant /vagrant/.env
+    echo "DB_NAME = flaskrest02 \nDB_USER = flaskrest02 \nDB_PASS = flaskrest02 \nDB_ADDR = localhost:5432 \n" >/vagrant/.env
+  SHELL
+
   # Add CouchDB docker container
   # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
   config.vm.provision "docker" do |d|
