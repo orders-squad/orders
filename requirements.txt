@@ -9,7 +9,7 @@ configparser==3.5.0
 coverage==4.5.1
 enum34==1.1.6
 flake8==3.5.0
-Flask==0.12.2
+Flask==0.12.3
 Flask-API==1.0
 flask-restplus==0.10.1
 Flask-SQLAlchemy==2.3.2
