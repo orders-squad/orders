@@ -112,6 +112,55 @@ $(function () {
     });
 
     // ****************************************
+    // View Orders
+    // ****************************************
+
+    $("#list-btn").click(function () {
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders",
+            contentType:"application/json"
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#order_results").empty();
+            $("#order_results").append('Orders:');
+            $("#order_results").append('<table class="table-striped">');
+            var header = '<tr>'
+            header += '<th style="width:10%">ID</th>'
+            header += '<th style="width:40%">Customer ID</th>'
+            header += '<th style="width:10%">Status</th></tr>'
+            $("#order_results").append(header);
+            console.log(res.length);
+            console.log(res);
+            for(var i = 0; i < res.length; i++) {
+                order = res[i];
+                var items = order.items;
+                var status;
+                for(var j = 0;j<items.length;j++){
+                    var item = items[j];
+                    status = item.status
+                }
+                console.log("status");
+                console.log(status);
+                var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
+                $("#order_results").append(row);
+            }
+
+            $("#order_results").append('</table>');
+
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
     // Create an Item
     // ****************************************
 
@@ -137,6 +186,57 @@ $(function () {
         clear_item_form_data();
 
         update_items_view();
+
+    });
+
+    // ****************************************
+    // View Items
+    // ****************************************
+
+    $("#list-btn-item").click(function () {
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders",
+            contentType:"application/json"
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#item_results").empty();
+            $("#item_results").append('Items:');
+            $("#item_results").append('<table class="table-striped">');
+            var header = '<tr>'
+            header += '<th style="width:10%">ID</th>'
+            header += '<th style="width:15%">Order ID</th>'
+            header += '<th style="width:15%">Product ID</th>'
+            header += '<th style="width:25%">Name</th>'
+            header += '<th style="width:15%">Quantity</th>'
+            header += '<th style="width:15%">Price</th></tr>'
+            $("#item_results").append(header);
+            console.log(" list item ");
+            console.log(res[0]);
+            var t = res[0];
+            console.log(t.items.length);
+            var items = res[3];
+            for(var i = 0; i < res.length; i++) {
+                items = res[i].items;
+                for(var j = 0; j < items.length; j++){
+                    item = items[0];
+                    console.log(item.prod_name)
+                    var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td></tr>";
+                    $("#item_results").append(row);
+                }
+            }
+
+            $("#item_results").append('</table>');
+
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message("res.responseJSON.message")
+        });
 
     });
 
