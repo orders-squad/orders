@@ -31,3 +31,10 @@ Scenario: Create an Order
 	And I set the "customer id" to "123"
 	And I press the "Create" order button
 	Then I should see the message "Success"
+
+Scenario: List all Orders
+	When I visit the "Home Page"
+	And I press the "List" order button
+	Then I should see "1" in the results
+	Then I should see "ordered" in the results
+	And I should see "2" in the results
