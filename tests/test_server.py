@@ -104,9 +104,15 @@ class TestOrderServer(unittest.TestCase):
         #data = resp.data
         #self.assertIn('<!DOCTYPE html>', data)
         #self.assertIn('<title>Order REST API Service</title>', data)
+    def test_swaggerdoc_index(self):
+        '''Test the Home Page'''
+        resp = self.client.get('/apidoc')
+        self.assertEqual(resp.status_code,status.HTTP_200_OK)
+        data = resp.data
+        self.assertIn('<!DOCTYPE html>', data)
+        self.assertIn('<title>Order REST API Service</title>', data)
 
     def test_healthcheck_page(self):
-        """ Test the healthcheck page """
         resp = self.client.get('/healthcheck')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIn('Healthy', resp.data)
