@@ -140,3 +140,13 @@ def step_impl(context, button):
         context.driver.find_element_by_id(button_id).click()
     else:
         context.driver.find_element_by_id(button_id).click()
+
+@when(u'I change "{element_name}" to "{text_string}"')
+def step_impl(context, element_name, text_string):
+    element_id = element_name.lower()
+    #element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    # element.clear()
+    element.send_keys(text_string)

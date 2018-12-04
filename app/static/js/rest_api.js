@@ -7,7 +7,7 @@ $(function () {
     // Updates the form with data from the response
     function update_form_data(res) {
         console.log(" length");
-        console.log(res.items);
+        console.log(res);
         $("#order_id").val(res.id);
         $("#cust_id").val(res.cust_id);
         var items = res.items;
@@ -103,6 +103,115 @@ $(function () {
     });
 
     // ****************************************
+    // Update an Order
+    // ****************************************
+
+    $("#update-btn").click(function () {
+
+        var order_id = $("#order_id").val();
+        var cust_id = $("#cust_id").val();
+        var items = items_for_order;
+
+        var data = {
+            "cust_id": cust_id,
+            "items": items
+        };
+        var ajax = $.ajax({
+                type: "PUT",
+                url: "/orders/" + order_id,
+                contentType:"application/json",
+                data: JSON.stringify(data)
+            })
+
+        ajax.done(function(res){
+            //update_form_data(res)
+            $("#order_id").val(res.id);
+            $("#cust_id").val(res.cust_id);
+            var items = res[0].items;
+            for(var i=0;i< items.length;i++){
+                item = items[i];
+                $("#item_order_status").val(item.status); 
+            } 
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Search Orders by field
+    // ****************************************
+
+    $("#search-btn").click(function () {
+        var order_id = $("#order_id").val();
+        var customer_id = $("#cust_id").val();
+        var status = $("#status").val();
+
+        var queryString = ""
+
+        if (order_id) {
+            queryString += 'order_id=' + order_id
+        }
+        if (customer_id) {
+            queryString += 'cust_id=' + customer_id
+        }
+        if (status) {
+            if (queryString.length > 0) {
+                queryString += '&status=' + status
+            } else {
+                queryString += 'status=' + status
+            }
+        }
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders?" + queryString,
+            contentType:"application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#order_results").empty();
+            $("#order_results").append('Orders:');
+            $("#order_results").append('<table class="table-striped">');
+            var header = '<tr>'
+            header += '<th style="width:20%">ID</th>'
+            header += '<th style="width:20%">Customer ID</th>'
+            header += '<th style="width:20%">Status</th></tr>'
+            $("#order_results").append(header);
+            var temp = 0;
+            for(var i = 0; i < res.length; i++) {
+                order = res[i];
+                var items = order.items;
+                var status;
+                for(var j = 0;j<items.length;j++){
+                    var item = items[j];
+                    status = item.status
+                }
+                if(customer_id == order.cust_id && order_id == order.id){
+                    temp = 1;
+                    var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
+                    $("#order_results").append(row);
+                } 
+            }
+            $("#order_results").append('</table>');
+            //var rowcount = $('#order_results tbody').children().length;
+            if(temp == 0){
+                flash_message("Invalid Customer Id or Order ID ");
+            } else {
+                flash_message("Success");
+            }
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message);
+        });
+    });
+
+    // ****************************************
     // Clear the form
     // ****************************************
 
@@ -129,12 +238,10 @@ $(function () {
             $("#order_results").append('Orders:');
             $("#order_results").append('<table class="table-striped">');
             var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:40%">Customer ID</th>'
-            header += '<th style="width:10%">Status</th></tr>'
+            header += '<th style="width:20%">ID</th>'
+            header += '<th style="width:20%">Customer ID</th>'
+            header += '<th style="width:20%">Status</th></tr>'
             $("#order_results").append(header);
-            console.log(res.length);
-            console.log(res);
             for(var i = 0; i < res.length; i++) {
                 order = res[i];
                 var items = order.items;
@@ -143,8 +250,6 @@ $(function () {
                     var item = items[j];
                     status = item.status
                 }
-                console.log("status");
-                console.log(status);
                 var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
                 $("#order_results").append(row);
             }
