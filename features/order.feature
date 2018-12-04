@@ -38,3 +38,13 @@ Scenario: List all Orders
 	Then I should see "1" in the results
 	Then I should see "ordered" in the results
 	And I should see "2" in the results
+
+Scenario: Update an Order
+	When I visit the "Home Page"
+	And I set the "order_Id" to "2"
+	And I set the "customer id" to "2"
+	And I press the "search" order button
+	When I change "order_Id" to "3"
+	And I set the "customer id" to "2"
+	And I press the "update" order button
+	Then I should see the message "Success"
