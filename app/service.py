@@ -265,6 +265,35 @@ class RequestRefundResource(Resource):
         Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
         return order_item.serialize(), status.HTTP_200_OK
 
+######################################################################
+#  PATH: /orders/{id}/cancel-refund
+#  CANCEL A REFUND
+######################################################################
+
+@api.route('/orders/<int:order_item_id>/cancel-refund')
+@api.param('order_item_id','the order item id')
+class CancelRefundResource(Resource):
+    """ Cancels refund action on an Order"""
+    @api.doc('cancel_refund')
+    @api.response(404,'Order item not found')
+    def delete(self,order_item_id):
+        """
+        Cancel a refund of an order
+        This endpoint will cancel a refund of an Order based the id specified in the path
+        """
+        order_item = Order.find_by_order_item_id(order_item_id)
+        app.logger.info('Cancel the request to refund an Order item')
+        app.logger.info(order_item)
+        if not order_item:
+            abort(status.HTTP_404_NOT_FOUND,"Order item id '{}' was not found.".format(order_item_id))
+        order_item.status = "refund_canceled"
+        order = Order.find(order_item.order_id)
+        order.delete()
+        Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+        return order_item.serialize(), status.HTTP_200_OK
+
+
+
 
 ######################################################################
 #  PATH: /orders/{id}/approve-refund
