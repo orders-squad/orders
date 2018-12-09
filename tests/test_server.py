@@ -243,7 +243,8 @@ class TestOrderServer(unittest.TestCase):
 
     def test_cancel_refund(self):
         """ Cancel a refund """
-        resp = self.client.put('/orders/{}/cancel-refund'.format(order))
+        self.client.put('/orders/1/request-refund')
+        resp = self.client.put('/orders/1/cancel-refund')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['status'],'refund_canceled')

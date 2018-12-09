@@ -276,7 +276,7 @@ class CancelRefundResource(Resource):
     """ Cancels refund action on an Order"""
     @api.doc('cancel_refund')
     @api.response(404,'Order item not found')
-    def delete(self,order_item_id):
+    def put(self,order_item_id):
         """
         Cancel a refund of an order
         This endpoint will cancel a refund of an Order based the id specified in the path
@@ -286,7 +286,7 @@ class CancelRefundResource(Resource):
         app.logger.info(order_item)
         if not order_item:
             abort(status.HTTP_404_NOT_FOUND,"Order item id '{}' was not found.".format(order_item_id))
-        if order_item.status == 'refund_requested':
+        elif order_item.status == 'refund_requested':
             order_item.status = "refund_canceled"
             order = Order.find(order_item.order_id)
             order.save()
