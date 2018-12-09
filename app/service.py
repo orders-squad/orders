@@ -184,7 +184,7 @@ class OrderResource(Resource):
 
 
 ######################################################################
-#  PATH: /pets
+#  PATH: /orders
 ######################################################################
 @api.route('/orders', strict_slashes=False)
 class OrderCollection(Resource):
@@ -286,10 +286,11 @@ class CancelRefundResource(Resource):
         app.logger.info(order_item)
         if not order_item:
             abort(status.HTTP_404_NOT_FOUND,"Order item id '{}' was not found.".format(order_item_id))
-        order_item.status = "refund_canceled"
-        order = Order.find(order_item.order_id)
-        order.delete()
-        Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
+        if order_item.status == 'refund_requested':
+            order_item.status = "refund_canceled"
+            order = Order.find(order_item.order_id)
+            order.save()
+            Order.logger.info("Order with order item id '%s' set to status '%s'", order_item.id, order_item.status)
         return order_item.serialize(), status.HTTP_200_OK
 
 
