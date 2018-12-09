@@ -252,7 +252,7 @@ class TestOrderServer(unittest.TestCase):
     def test_bad_cancel_refund(self):
         """ Test a bad cancel refund error from invalid order id """
         order = 11111
-        resp = self.client.put('/orders/{}/request-refund'.format(order))
+        resp = self.client.put('/orders/{}/cancel-refund'.format(order))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_bad_request_refund(self):
