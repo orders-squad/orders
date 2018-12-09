@@ -5,59 +5,26 @@ Orders microservice
 
 ## How to run the code
 
-- In shell:
-```shell
-vagrant up
-vagrant ssh
-cd /vagrant
-python run.py
-```
+The `Orders` APP has already been deployed to Bluemix, so 
+directly visit [this link](https://nyu-order-service-f18.mybluemix.net/) to use the APP.
 
-- Then in your browser's address bar type this address:
-`localhost:5000`
 
-If everything works fine, you'll get an `HTTP 200` and a pair of braces`[]`(because the database is empty).
+If everything works fine, you'll see the APP's beautiful homepage.
+
 
 ## Create a new order
-Please first install `httpie`(`brew install httpie`).  
-Then in your terminal please type:
-```shell
-http --json POST :5000/orders price=11.5 prod_id=1 prod_name='bread' status='test' cust_id=9
-```
+Just fill the table entries and click `Create` button.
 
-And if everything works fine, the response is like following:
-```
-HTTP/1.0 201 CREATED
-Content-Length: 127
-Content-Type: application/json
-Date: Mon, 15 Oct 2018 19:36:43 GMT
-Location: http://localhost:5000/orders/8
-Server: Werkzeug/0.14.1 Python/2.7.12
 
-{
-    "created_on": "Mon, 15 Oct 2018 19:36:43 GMT",
-    "cust_id": 9,
-    "id": 8,
-    "price": 11.5,
-    "prod_id": 1,
-    "prod_name": "bread",
-    "status": "test"
-}
-```
+And if everything works fine, an Order will be created.
+
 
 ## List all orders
 Use this link:
-`http://localhost:5000/orders`
+`https://nyu-order-service-f18.mybluemix.net/orders`
 
 ## Run unit tests
-Note that Travis CI and codecov have already taken care of building and
-testing.  
-If you prefer to run the test manually, please run:
-```shell
-nosetests
-```
+Bluemix is taking care of unit tests in its devops toolchain and pipeline.
+Each github submission will trigger the pipeline.
 
-To see code coverage reports, please run:
-```shell
-coverage report -m
-```
+
