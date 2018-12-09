@@ -241,6 +241,20 @@ class TestOrderServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['status'], 'refund_requested')
 
+    def test_cancel_refund(self):
+        """ Cancel a refund """
+        self.client.put('/orders/1/request-refund')
+        resp = self.client.put('/orders/1/cancel-refund')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['status'],'refund_canceled')
+
+    def test_bad_cancel_refund(self):
+        """ Test a bad cancel refund error from invalid order id """
+        order = 11111
+        resp = self.client.put('/orders/{}/cancel-refund'.format(order))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_bad_request_refund(self):
         """ Test a bad refund request error from invalid order id """
         order = 11111
