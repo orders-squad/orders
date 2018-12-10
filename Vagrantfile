@@ -78,18 +78,18 @@ Vagrant.configure(2) do |config|
   ######################################################################
   # Add CouchDB docker container
   ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo mkdir -p /opt/couchdb/data
-    sudo chown vagrant:vagrant /opt/couchdb/data
-  SHELL
+  # config.vm.provision "shell", inline: <<-SHELL
+  #  sudo mkdir -p /opt/couchdb/data
+  #  sudo chown vagrant:vagrant /opt/couchdb/data
+  # SHELL
 
   # Add CouchDB docker container
   # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
-  end
+  # config.vm.provision "docker" do |d|
+  #  d.pull_images "couchdb"
+  #  d.run "couchdb",
+  #    args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # end
 
   ######################################################################
   # Setup a Bluemix and Kubernetes environment
@@ -120,10 +120,10 @@ Vagrant.configure(2) do |config|
   ######################################################################
   # Add CouchDB docker container
   ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo mkdir -p /opt/couchdb/data
-    sudo chown vagrant:vagrant /opt/couchdb/data
-  SHELL
+  # config.vm.provision "shell", inline: <<-SHELL
+  #  sudo mkdir -p /opt/couchdb/data
+  #  sudo chown vagrant:vagrant /opt/couchdb/data
+  # SHELL
 
   ######################################################################
   # Create .env file
@@ -133,16 +133,16 @@ Vagrant.configure(2) do |config|
     sudo rm -rf /vagrant/.env
     sudo touch /vagrant .env
     sudo chown vagrant:vagrant /vagrant/.env
-    echo "DB_NAME = compose \n DB_USER = admin  \n DB_PASS = AUVJGCLENSMTYVCF  \n DB_ADDR = sl-us-south-1-portal.44.dblayer.com:16950 \n" >/vagrant/.env
+    echo "DB_NAME = flaskrest02 \n DB_USER = flaskrest02  \n DB_PASS = flaskrest02 \n DB_ADDR = localhost \n" >/vagrant/.env
   SHELL
 
   # Add CouchDB docker container
   # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
-  end
+  # config.vm.provision "docker" do |d|
+  #  d.pull_images "couchdb"
+  #  d.run "couchdb",
+  #    args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # end
 
   ######################################################################
   # Setup a Bluemix and Kubernetes environment

@@ -26,7 +26,7 @@ from . import app
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET'], strict_slashes=False)
 def index():
    """ Root URL response """
    return app.send_static_file('index.html')
