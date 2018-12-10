@@ -244,6 +244,31 @@ $(function () {
     });
 
     // ****************************************
+    // Delete an Order
+    // ****************************************
+
+    $("#delete-btn").click(function () {
+
+        var order_id = $("#order_id").val();
+
+        var ajax = $.ajax({
+            type: "DELETE",
+            url: "/orders/" + order_id,
+            contentType:"application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
+
+    // ****************************************
     // Clear the form
     // ****************************************
 
@@ -324,6 +349,149 @@ $(function () {
 
         update_items_view();
 
+    });
+
+    // ****************************************
+    // View Items
+    // ****************************************
+
+    $("#list-btn-item").click(function () {
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders",
+            contentType:"application/json"
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#item_results").empty();
+            $("#item_results").append('Items:');
+            $("#item_results").append('<table class="table-striped">');
+            var header = '<tr>'
+            header += '<th style="width:10%">ID</th>'
+            header += '<th style="width:15%">Order ID</th>'
+            header += '<th style="width:15%">Product ID</th>'
+            header += '<th style="width:25%">Name</th>'
+            header += '<th style="width:15%">Quantity</th>'
+            header += '<th style="width:15%">Price</th></tr>'
+            $("#item_results").append(header);
+            console.log(" list item ");
+            console.log(res[0]);
+            var t = res[0];
+            console.log(t.items.length);
+            var items = res[3];
+            for(var i = 0; i < res.length; i++) {
+                items = res[i].items;
+                for(var j = 0; j < items.length; j++){
+                    item = items[0];
+                    console.log(item.prod_name)
+                    var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td></tr>";
+                    $("#item_results").append(row);
+                }
+            }
+
+            $("#item_results").append('</table>');
+
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message("res.responseJSON.message")
+        });
+
+    });
+
+    // ****************************************
+    // Search Items by field
+    // ****************************************
+
+    $("#search-btn-item").click(function () {
+
+        var product_id = $("#item_product_id").val();
+        var order_id = $("#item_order_id").val();
+        var name = $("#item_name").val();
+        var quantity = $("#item_quantity").val();
+        var price = $("#item_price").val();
+
+        var queryString = ""
+
+        if (product_id) {
+            queryString += 'prod_id=' + product_id
+        }
+        if (order_id) {
+            if (queryString.length > 0) {
+                queryString += '&order_id=' + order_id
+            } else {
+                queryString += 'order_id=' + order_id
+            }
+        }
+        if (name) {
+            if (queryString.length > 0) {
+                queryString += '&prod_name=' + name
+            } else {
+                queryString += 'prod_name=' + name
+            }
+        }
+        if (quantity) {
+            if (queryString.length > 0) {
+                queryString += '&prod_qty=' + quantity
+            } else {
+                queryString += 'prod_qty=' + quantity
+            }
+        }
+        if (price) {
+            if (queryString.length > 0) {
+                queryString += '&prod_price=' + price
+            } else {
+                queryString += 'prod_price=' + price
+            }
+        }
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders?" + queryString,
+            contentType:"application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //console.log(res)
+            $("#item_results").empty();
+            $("#item_results").append('<table class="table-striped">');
+            var header = '<tr>'
+            header += '<th style="width:10%">ID</th>'
+            header += '<th style="width:10%">Order ID</th>'
+            header += '<th style="width:10%">Product ID</th>'
+            header += '<th style="width:40%">Name</th>'
+            header += '<th style="width:15%">Quantity</th></tr>'
+            header += '<th style="width:15%">Price</th></tr>'
+            $("#item_results").append(header);
+            for(var i = 0; i < res.length; i++) {
+                item = res[i].items;
+                for(var j = 0;j<item.length;j++){
+                    prd_name = item[j].prod_name;
+                    console.log(name);
+                    if(prd_name == name){
+                    var row = "<tr><td>"+item[j].id+"</td><td>"+item[j].order_id+"</td><td>"+item[j].prod_id+"</td><td>"+item[j].prod_name+"</td><"+"</td><td>"+item[j].prod_qty+"</td><td>"+"</td><td>"+item[j].prod_price+"</td></tr>";
+                    $("#item_results").append(row);       
+                    }
+                }
+                
+                if(i == 0) {
+                  update_item_form_data(res[i]);
+                  $("#item_id").val(res[i].id);
+                }
+            }
+
+            $("#item_results").append('</table>');
+
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
     });
 
     // ****************************************
