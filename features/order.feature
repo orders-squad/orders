@@ -59,3 +59,17 @@ Scenario: Read an Order
 	Then I should see "1" in the "order_id" field
     	Then I should see "ordered" in the "order_status" field
 	Then I should see the message "Success"
+
+Scenario: List all items
+    	When I visit the "Home Page"
+    	And I press the "list" item button
+    	Then I should see "kindle" in the item results
+    	And I should see "2" in the item results
+    	And I should not see "pepper" in the item results
+
+Scenario: Query an item
+    	When I visit the "Home Page"
+    	And I set the "name" to "kindle"
+    	And I press the "search" item button
+    	Then I should see the message "Success"
+    	And I should see "40.5" in the item results
