@@ -6,14 +6,11 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        console.log(" length");
-        console.log(res);
         $("#order_id").val(res.id);
         $("#cust_id").val(res.cust_id);
         var items = res.items;
         for(var i=0;i< items.length;i++){
             item = items[i];
-            console.log(item.status);
             $("#item_order_status").val(item.status); 
         } 
     }
@@ -21,6 +18,8 @@ $(function () {
     /// Clears all form fields
     function clear_form_data() {
         $("#cust_id").val("");
+        $("#order_id").val("");
+        $("#item_order_status").val("");
     }
 
     // Updates the flash message area
@@ -132,11 +131,13 @@ $(function () {
                 item = items[i];
                 $("#item_order_status").val(item.status); 
             } 
-            flash_message("Success")
+            console.log("Success");
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
+            console.log("not Success");
+            flash_message(res.responseJSON.message);
         });
     });
 
@@ -147,7 +148,7 @@ $(function () {
     $("#search-btn").click(function () {
         var order_id = $("#order_id").val();
         var customer_id = $("#cust_id").val();
-        var status = $("#status").val();
+        var status = $("#item_order_status").val();
 
         var queryString = ""
 
@@ -183,6 +184,7 @@ $(function () {
             header += '<th style="width:20%">Status</th></tr>'
             $("#order_results").append(header);
             var temp = 0;
+            var j = 0;
             for(var i = 0; i < res.length; i++) {
                 order = res[i];
                 var items = order.items;
@@ -195,7 +197,11 @@ $(function () {
                     temp = 1;
                     var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
                     $("#order_results").append(row);
+                    j = i;
                 } 
+                if(j) {
+                  update_form_data(res[j]);
+                }
             }
             $("#order_results").append('</table>');
             //var rowcount = $('#order_results tbody').children().length;
@@ -208,6 +214,32 @@ $(function () {
 
         ajax.fail(function(res){
             flash_message(res.responseJSON.message);
+        });
+    });
+    
+
+    // ****************************************
+    // Retrieve an Order
+    // ****************************************
+
+    $("#retrieve-btn").click(function () {
+
+        var order_id = $("#order_id").val();
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id,
+            contentType:"application/json",
+            data: ''
+        })
+        ajax.done(function(res){
+            //alert(res.toSource())
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
         });
     });
 
@@ -293,58 +325,6 @@ $(function () {
         update_items_view();
 
     });
-
-    // ****************************************
-    // View Items
-    // ****************************************
-
-    $("#list-btn-item").click(function () {
-
-        var ajax = $.ajax({
-            type: "GET",
-            url: "/orders",
-            contentType:"application/json"
-        })
-
-        ajax.done(function(res){
-            //alert(res.toSource())
-            $("#item_results").empty();
-            $("#item_results").append('Items:');
-            $("#item_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:15%">Order ID</th>'
-            header += '<th style="width:15%">Product ID</th>'
-            header += '<th style="width:25%">Name</th>'
-            header += '<th style="width:15%">Quantity</th>'
-            header += '<th style="width:15%">Price</th></tr>'
-            $("#item_results").append(header);
-            console.log(" list item ");
-            console.log(res[0]);
-            var t = res[0];
-            console.log(t.items.length);
-            var items = res[3];
-            for(var i = 0; i < res.length; i++) {
-                items = res[i].items;
-                for(var j = 0; j < items.length; j++){
-                    item = items[0];
-                    console.log(item.prod_name)
-                    var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td></tr>";
-                    $("#item_results").append(row);
-                }
-            }
-
-            $("#item_results").append('</table>');
-
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message("res.responseJSON.message")
-        });
-
-    });
-
 
     // ****************************************
     // Clear the form
