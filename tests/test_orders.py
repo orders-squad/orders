@@ -9,7 +9,7 @@ Test cases can be run with:
 import unittest
 import os
 from app.models import Order, OrderItem, DataValidationError, db
-from app import app, get_env_variable
+from app import app, service, get_env_variable
 
 
 DB_NAME = get_env_variable('DB_NAME')
@@ -32,6 +32,7 @@ class TestOrders(unittest.TestCase):
         """ These run once per Test suite """
         app.debug = False
         # Set up the test database
+        Order.logger.info('Initializing database')
         app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
@@ -39,7 +40,9 @@ class TestOrders(unittest.TestCase):
         pass
 
     def setUp(self):
-        Order.init_db(app)
+        Order.app = app
+        app.app_context().push()
+        service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
