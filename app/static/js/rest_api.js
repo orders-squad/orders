@@ -403,6 +403,27 @@ $(function () {
     });
 
     // ****************************************
+    // Retrieve an Item
+    // ****************************************
+    $("#retrieve-btn").click(function(){
+
+        var name = $("#item_name").val();
+        var product_id = $("#item_product_id").val();
+        var ajax = $.ajax({
+            tyep: "GET",
+            url : "/orders/"+ product_id,
+            contentType:"application/json",
+            data:''
+        })
+        ajax.done(function(res){
+            flash_message("Success")
+        });
+
+    });
+
+
+
+    // ****************************************
     // Search Items by field
     // ****************************************
 

@@ -6,7 +6,7 @@ Feature: The order store service back-end
 Background:
 	Given the following orders
 	    | cust_id | prod_id | prod_name | prod_qty | prod_price | status  | 
-	    | 1       | 1 	| echo dot  | 2        | 50.5       | ordered |   
+	    | 1       | 1 	    | echo dot  | 2        | 50.5       | ordered |   
 	    | 2       | 2       | kindle    | 3        | 40.5       | ordered |   
 
 Scenario: The server is running
@@ -73,3 +73,15 @@ Scenario: Query an item
     	And I press the "search" item button
     	Then I should see the message "Success"
     	And I should see "40.5" in the item results
+
+Scenario: Read an item
+		When I visit the "Home Page"
+		And I set the "prod_name" to "kindle"
+		And I press the "search" item button
+		And I press the "retrieve" item button
+		Then I should see "2" in the "prod_id" field
+		Then I should see "kindle" in the "prod_name" field
+		Then I should see "3" in the "prod_qty" field
+		Then I should see "40.5" in the "prod_price" field
+		Then I should see "ordered" in the "order_status" field
+		Then I should see the message "Success"
