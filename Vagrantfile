@@ -133,7 +133,7 @@ Vagrant.configure(2) do |config|
     sudo rm -rf /vagrant/.env
     sudo touch /vagrant .env
     sudo chown vagrant:vagrant /vagrant/.env
-    echo "DB_NAME = compose \n DB_USER = admin  \n DB_PASS = AUVJGCLENSMTYVCF  \n DB_ADDR = sl-us-south-1-portal.44.dblayer.com:16950 \n" >/vagrant/.env
+    echo "DB_NAME = compose \n DB_USER = flaskrest02  \n DB_PASS = flaskrest02 \n DB_ADDR = localhost \n" >/vagrant/.env
   SHELL
 
   # Add CouchDB docker container
