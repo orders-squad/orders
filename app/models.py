@@ -81,13 +81,15 @@ class Order(db.Model):
         except KeyError as error:
             return "Invalid order: missing " + error.args[0], False
         return self, True
-    
+
     @staticmethod
     def init_db(app):
         Order.logger.info('Initializing database')
         Order.app = app
         db.init_app(app)
-        app.app_context().push()
+        # This context is only used by nosetests so we
+        # move it to test code
+        # app.app_context().push()
         db.create_all()
 
     @staticmethod

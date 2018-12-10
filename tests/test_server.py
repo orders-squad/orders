@@ -16,7 +16,7 @@ from mock import MagicMock, patch
 
 from app.models import Order, OrderItem, DataValidationError, db
 import app.service as service
-from app import get_env_variable
+from app import app, get_env_variable
 
 
 DB_NAME = get_env_variable('DB_NAME')
@@ -49,6 +49,7 @@ class TestOrderServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
+        app.app_context().push()
         service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
