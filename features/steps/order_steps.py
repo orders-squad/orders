@@ -185,3 +185,66 @@ def step_impl(context, name):
     element = context.driver.find_element_by_id('item_results')
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
+
+
+@when(u'I set the "{element_name}" to "{text_string}"')
+def step_impl(context, element_name, text_string):
+    element_id = element_name.lower()
+    if element_id == 'customer id':
+        element_id = 'cust_id'
+    elif element_id == 'product id':
+        element_id = 'prod_id'
+    else:
+        element_id = 'item_' + element_id
+    element = context.driver.find_element_by_id(element_id)
+    element.send_keys(text_string)    
+
+@when(u'I press the "{button}" item button')
+def step_impl(context, button):
+    button_id = button.lower() + '-btn-item'
+
+    if button == "retrieve":
+        time.sleep(5)
+        element = context.driver.find_element_by_id('prod_id').text
+
+        found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+            expected_conditions.text_to_be_present_in_element(
+                (By.ID, 'prod_id'), element
+            )
+        )
+        expect(found).to_be(True)
+        context.driver.find_element_by_id(button_id).click()
+    else:
+        context.driver.find_element_by_id(button_id).click()
+
+@then(u'I should see "{text_string}" in the "{element_name}" field')
+def step_impl(context, text_string, element_name):
+    element_id = element_name.lower()
+    if element_id == 'customer id':
+        element_id = 'cust_id'
+    elif element_id == 'product id':
+        element_id = 'prod_id'
+    else:
+        element_id = 'item_' + element_id
+    #element = context.driver.find_element_by_id(element_id)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element_value(
+            (By.ID, element_id),
+            text_string
+        )
+    )
+    #expect(element.get_attribute('value')).to_equal(text_string)
+    expect(found).to_be(True)
+
+@then(u'I should see "{name}" in the item results')
+def step_impl(context, name):
+    found = WebDriverWait(context.driver, 40).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'item_results'),
+            name
+        )
+    )
+    expect(found).to_be(True)
+    
+
+
