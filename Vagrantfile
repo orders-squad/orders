@@ -78,18 +78,18 @@ Vagrant.configure(2) do |config|
   ######################################################################
   # Add CouchDB docker container
   ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo mkdir -p /opt/couchdb/data
-    sudo chown vagrant:vagrant /opt/couchdb/data
-  SHELL
+  # config.vm.provision "shell", inline: <<-SHELL
+  #  sudo mkdir -p /opt/couchdb/data
+  #  sudo chown vagrant:vagrant /opt/couchdb/data
+  # SHELL
 
   # Add CouchDB docker container
   # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
-  end
+  # config.vm.provision "docker" do |d|
+  #  d.pull_images "couchdb"
+  #  d.run "couchdb",
+  #    args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # end
 
   ######################################################################
   # Setup a Bluemix and Kubernetes environment
@@ -120,10 +120,10 @@ Vagrant.configure(2) do |config|
   ######################################################################
   # Add CouchDB docker container
   ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo mkdir -p /opt/couchdb/data
-    sudo chown vagrant:vagrant /opt/couchdb/data
-  SHELL
+  # config.vm.provision "shell", inline: <<-SHELL
+  #  sudo mkdir -p /opt/couchdb/data
+  #  sudo chown vagrant:vagrant /opt/couchdb/data
+  # SHELL
 
   ######################################################################
   # Create .env file
@@ -138,11 +138,11 @@ Vagrant.configure(2) do |config|
 
   # Add CouchDB docker container
   # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
-  end
+  # config.vm.provision "docker" do |d|
+  #  d.pull_images "couchdb"
+  #  d.run "couchdb",
+  #    args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # end
 
   ######################################################################
   # Setup a Bluemix and Kubernetes environment
