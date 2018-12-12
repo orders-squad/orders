@@ -103,7 +103,7 @@ Scenario: Request a refund of an ordered item
   When I visit the "Home Page"
   And I set the "order_item_id" to "1"
   And I press the "request-refund" item button
-  Then I should see the message "Success
+  Then I should see the message "Success"
 
 
 Scenario: Approve a refund of an ordered item
