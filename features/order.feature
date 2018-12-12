@@ -75,13 +75,11 @@ Scenario: Query an item
     	And I should see "40.5" in the item results
 
 Scenario: Read an item
-		When I visit the "Home Page"
-		And I set the "prod_name" to "kindle"
-		And I press the "search" item button
-		And I press the "retrieve" item button
-		Then I should see "2" in the "prod_id" field
-		Then I should see "kindle" in the "prod_name" field
-		Then I should see "3" in the "prod_qty" field
-		Then I should see "40.5" in the "prod_price" field
-		Then I should see "ordered" in the "order_status" field
-		Then I should see the message "Success"
+   		When I visit the "Home Page"
+   		And I set the "name" to "kindle"
+   		And I press the "search" item button
+   		Then I should see "2" in the "product_id" field
+   		Then I should see "kindle" in the "name" field
+   		Then I should see "3" in the "quantity" field
+   		Then I should see "40.5" in the "price" field
+   		Then I should see the message "Success"

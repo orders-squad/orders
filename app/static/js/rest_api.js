@@ -40,14 +40,20 @@ $(function () {
 
     // Updates the form with data from the response
     function update_item_form_data(res) {
-        $("#item_order_id").val(res.order_id);
-        $("#item_product_id").val(res.prod_id);
-        $("#item_name").val(res.prod_name);
-        $("#item_quantity").val(res.prod_qty);
-        $("#item_price").val(res.prod_price);
-        $("#item_status").val(res.status);
-    }
-
+        console.log("res: ", res.items);
+        var items = res.items;
+        console.log(items[0].order_id);
+        console.log(items[0].prod_id);
+        console.log(items[0].prod_name);
+        console.log(items[0].prod_qty);
+        console.log(items[0].prod_price);
+        $("#item_order_id").val(items[0].order_id);
+        $("#item_product_id").val(items[0].prod_id);
+        $("#item_name").val(items[0].prod_name);
+        $("#item_quantity").val(items[0].prod_qty);
+        $("#item_price").val(items[0].prod_price);
+        $("#item_status").val(items[0].status);
+   }
     // add items to orders
     var items_for_order = [];
 
@@ -402,33 +408,12 @@ $(function () {
 
     });
 
-    // ****************************************
-    // Retrieve an Item
-    // ****************************************
-    $("#retrieve-btn").click(function(){
-
-        var name = $("#item_name").val();
-        var product_id = $("#item_product_id").val();
-        var ajax = $.ajax({
-            tyep: "GET",
-            url : "/orders/"+ product_id,
-            contentType:"application/json",
-            data:''
-        })
-        ajax.done(function(res){
-            flash_message("Success")
-        });
-
-    });
-
-
 
     // ****************************************
     // Search Items by field
     // ****************************************
 
-    $("#search-btn-item").click(function () {
-
+   $("#search-btn-item").click(function () {
         var product_id = $("#item_product_id").val();
         var order_id = $("#item_order_id").val();
         var name = $("#item_name").val();
@@ -439,35 +424,35 @@ $(function () {
 
         if (product_id) {
             queryString += 'prod_id=' + product_id
-        }
+       }
         if (order_id) {
             if (queryString.length > 0) {
                 queryString += '&order_id=' + order_id
             } else {
                 queryString += 'order_id=' + order_id
-            }
-        }
+           }
+       }
         if (name) {
             if (queryString.length > 0) {
                 queryString += '&prod_name=' + name
             } else {
                 queryString += 'prod_name=' + name
             }
-        }
+       }
         if (quantity) {
             if (queryString.length > 0) {
                 queryString += '&prod_qty=' + quantity
             } else {
                 queryString += 'prod_qty=' + quantity
             }
-        }
+       }
         if (price) {
             if (queryString.length > 0) {
                 queryString += '&prod_price=' + price
             } else {
                 queryString += 'prod_price=' + price
             }
-        }
+       }
 
         var ajax = $.ajax({
             type: "GET",
@@ -477,17 +462,18 @@ $(function () {
         })
 
         ajax.done(function(res){
-            //console.log(res)
+           //console.log(res)
             $("#item_results").empty();
             $("#item_results").append('<table class="table-striped">');
             var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:10%">Order ID</th>'
-            header += '<th style="width:10%">Product ID</th>'
-            header += '<th style="width:40%">Name</th>'
-            header += '<th style="width:15%">Quantity</th></tr>'
-            header += '<th style="width:15%">Price</th></tr>'
+            header += '<th style="width:20%">ID</th>'
+            header += '<th style="width:20%">Order ID</th>'
+            header += '<th style="width:20%">Product ID</th>'
+            header += '<th style="width:20%">Name</th>'
+            header += '<th style="width:20%">Quantity</th>'
+            header += '<th style="width:20%">Price</th></tr>'
             $("#item_results").append(header);
+            var k = 0;
             for(var i = 0; i < res.length; i++) {
                 item = res[i].items;
                 for(var j = 0;j<item.length;j++){
@@ -495,15 +481,17 @@ $(function () {
                     console.log(name);
                     if(prd_name == name){
                     var row = "<tr><td>"+item[j].id+"</td><td>"+item[j].order_id+"</td><td>"+item[j].prod_id+"</td><td>"+item[j].prod_name+"</td><"+"</td><td>"+item[j].prod_qty+"</td><td>"+"</td><td>"+item[j].prod_price+"</td></tr>";
-                    $("#item_results").append(row);       
+                    $("#item_results").append(row);
+                    k = i;
                     }
                 }
-                
-                if(i == 0) {
-                  update_item_form_data(res[i]);
+
+                if(k) {
+                    console.log(res[i]);
+                  update_item_form_data(res[k]);
                   $("#item_id").val(res[i].id);
                 }
-            }
+           }
 
             $("#item_results").append('</table>');
 
