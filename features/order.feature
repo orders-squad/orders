@@ -101,3 +101,22 @@ Scenario: Read an item
         Then I should see "3" in the "quantity" field
         Then I should see "40.5" in the "price" field
         Then I should see the message "Success"
+
+Scenario: Request a refund of an ordered item
+  When I visit the "Home Page"
+  And I set the "order_item_id" to "1"
+  And I press the "request-refund" item button
+  Then I should see the message "Success
+
+
+Scenario: Approve a refund of an ordered item
+  When I visit the "Home Page"
+  And I set the "order_item_id" to "1"
+  And I press the "approve-refund" item button
+  Then I should see the message "Success"
+
+Scenario: Deny a refund of an ordered item
+  When I visit the "Home Page"
+  And I set the "order_item_id" to "1"
+  And I press the "deny-refund" item button
+  Then I should see the message "Success"
