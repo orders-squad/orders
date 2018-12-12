@@ -47,27 +47,24 @@ Scenario: Update an Order
 	And I press the "search" order button
 	And I press the "retrieve" order button
 	And I set the "order_Id" to "3"
-    	When I change "customer id" to "2"
-    	And I press the "update" order button
+    When I change "customer id" to "2"
+    And I press the "update" order button
 	Then I should see the message "Success"
 
 Scenario: Read an Order
-    	When I visit the "Home Page"
-        And I set the "order_id" to "1"
-    	And I set the "customer id" to "1"
-        And I press the "search" order button
-    	And I press the "retrieve" order button
-        Then I should see "1" in the "customer id" field    
-    	Then I should see "1" in the "order_id" field
-        Then I should see "ordered" in the "order_status" field
-    	Then I should see the message "Success"
+    When I visit the "Home Page"
+    And I set the "order_id" to "1"
+    And I set the "customer id" to "1"
+    And I press the "search" order button
+    And I press the "retrieve" order button
+    Then I should see "1" in the "customer id" field    
+    Then I should see "1" in the "order_id" field
+    Then I should see "ordered" in the "order_status" field
+    Then I should see the message "Success"
 
 Scenario: Delete an Order
         When I visit the "Home Page"
-        And I set the "order_id" to "2"
-    And I set the "customer id" to "2"
-        And I press the "search" order button
-    And I press the "retrieve" order button 
+        And I set the "order_id" to "2" 
         And I press the "delete" order button
         Then I should see the message "Success"
 
