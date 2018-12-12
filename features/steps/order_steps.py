@@ -15,6 +15,7 @@ from selenium.webdriver.support import expected_conditions
 
 WAIT_SECONDS = 20
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
+print(BASE_URL)
 
 @given(u'the following orders')
 def step_impl(context):
