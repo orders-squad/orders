@@ -250,6 +250,17 @@ class TestOrderServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['status'],'refund_canceled')
 
+    def test_invalid_method_for_cancel_refund(self):
+        """ Cancel refund should only support PUT method"""
+        resp = self.client.get('/orders/1/cancel-refund')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        resp_data = json.loads(resp.data)
+        self.assertEqual(resp_data['message'], 'The method is not allowed for the requested URL.')
+        resp = self.client.post('/orders/1/cancel-refund')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        resp = self.client.delete('/orders/1/cancel-refund')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def test_bad_cancel_refund(self):
         """ Test a bad cancel refund error from invalid order id """
         order = 11111
@@ -269,11 +280,8 @@ class TestOrderServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['status'], 'refund_approved')
 
-    def test_display_order(self):
-        
-        # resp = self.client.post('/orders',
-        #                        data=data,
-        #                        content_type='application/json')
+    def test_display_a_single_order(self):
+        """ display an existing order """
         resp = self.client.get('/orders/2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
