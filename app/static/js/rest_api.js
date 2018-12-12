@@ -160,6 +160,99 @@ $(function () {
         });
     });
 
+
+    // ****************************************
+    // Request a Refund
+    // ****************************************
+
+    $("#request-refund-btn-item").click(function () {
+
+        var order_item_id = $("#order_item_id").val();
+        var item_store = [];
+        var custom_id;
+        var data;
+
+        var ajax1 = $.ajax({
+            type: "PUT",
+            url: "/orders/" + order_item_id + "/request-refund",
+            contentType:"application/json",
+            data: ''
+        })
+
+        ajax1.done(function(res){
+            flash_message("Success");
+        });
+
+        ajax1.fail(function(res){
+            clear_form_data();
+            flash_message(res.responseJSON.message);
+        });
+    });
+
+
+    // ****************************************
+    // Approve a Refund
+    // ****************************************
+
+    $("#approve-refund-btn-item").click(function () {
+
+        var order_item_id = $("#order_item_id").val();
+        var item_store = [];
+        var custom_id;
+        var data;
+
+        var ajax1 = $.ajax({
+            type: "PUT",
+            url: "/orders/" + order_item_id + "/approve-refund",
+            contentType:"application/json",
+            data: ''
+        })
+
+        ajax1.done(function(res){
+            flash_message("Success");
+        });
+
+        ajax1.fail(function(res){
+            clear_form_data();
+            flash_message(res.responseJSON.message);
+        });
+    });
+
+    // ****************************************
+    // Approve a Refund
+    // ****************************************
+
+    $("#deny-refund-btn-item").click(function () {
+
+        var order_item_id = $("#order_item_id").val();
+        var item_store = [];
+        var custom_id;
+        var data;
+
+        var ajax1 = $.ajax({
+            type: "PUT",
+            url: "/orders/" + order_item_id + "/deny-refund",
+            contentType:"application/json",
+            data: ''
+        })
+
+        ajax1.done(function(res){
+            flash_message("Success");
+        });
+
+        ajax1.fail(function(res){
+            clear_form_data();
+            flash_message(res.responseJSON.message);
+        });
+    });
+
+
+
+
+
+
+
+
     // ****************************************
     // Search Orders by field
     // ****************************************

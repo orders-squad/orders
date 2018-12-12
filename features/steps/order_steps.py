@@ -60,6 +60,8 @@ def step_impl(context, element_name, text_string):
         element_id = 'cust_id'
     elif element_id == 'product id':
         element_id = 'prod_id'
+    elif element_id == 'order_item_id':
+        element_id = 'order_item_id'
     else:
         element_id = 'item_' + element_id
     element = context.driver.find_element_by_id(element_id)
