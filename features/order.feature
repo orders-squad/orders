@@ -64,16 +64,13 @@ Scenario: Read an Order
 
 Scenario: Delete an Order
         When I visit the "Home Page"
-        And I set the "order_id" to "2" 
+        And I set the "order_id" to "3"
         And I press the "delete" order button
         Then I should see the message "Success"
 
 Scenario: Cancel a order
         When I visit the "Home Page"
         And I set the "order_id" to "2"
-    And I set the "customer id" to "2"
-        And I press the "search" order Button
-        And I press the "retrieve" order button
         And I press the "cancel" order button
         Then I should see "canceled" in the "order_status" field
         And I should see the message "Order has been Canceled!"
