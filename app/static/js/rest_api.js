@@ -40,13 +40,7 @@ $(function () {
 
     // Updates the form with data from the response
     function update_item_form_data(res) {
-        console.log("res: ", res.items);
         var items = res.items;
-        console.log(items[0].order_id);
-        console.log(items[0].prod_id);
-        console.log(items[0].prod_name);
-        console.log(items[0].prod_qty);
-        console.log(items[0].prod_price);
         $("#item_order_id").val(items[0].order_id);
         $("#item_product_id").val(items[0].prod_id);
         $("#item_name").val(items[0].prod_name);
@@ -62,11 +56,11 @@ $(function () {
         $("#items_for_order").empty();
         $("#items_for_order").append('<table class="table-striped">');
         var header = '<tr>'
-        header += '<th style="width:10%">Product ID</th>'
-        header += '<th style="width:40%">Name</th>'
-        header += '<th style="width:25%">Quantity</th>'
-        header += '<th style="width:25%">Price</th></tr>'
-        header += '<th style="width:25%">Status</th></tr>'
+        header += '<th style="width:20%">Product ID</th>'
+        header += '<th style="width:20%">Name</th>'
+        header += '<th style="width:20%">Quantity</th>'
+        header += '<th style="width:20%">Price</th></tr>'
+        header += '<th style="width:20%">Status</th></tr>'
         $("#items_for_order").append(header);
         for(var i = 0; i < items_for_order.length; i++) {
             item = items_for_order[i];
@@ -99,8 +93,8 @@ $(function () {
         });
 
         ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
+            update_form_data(res);
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
@@ -116,34 +110,52 @@ $(function () {
 
         var order_id = $("#order_id").val();
         var cust_id = $("#cust_id").val();
-        var items = items_for_order;
+        //var items = items_for_order;
+        var item_store = [];
+        var custom_id;
+        var data;
 
-        var data = {
-            "cust_id": cust_id,
-            "items": items
-        };
-        var ajax = $.ajax({
+        var ajax1 = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id,
+            contentType:"application/json",
+            data: ''
+        })
+    
+        ajax1.done(function(res){
+            custom_id = res.cust_id;
+            var items = res.items;
+            for(var i=0;i<items.length;i++){
+                item_store.push(items[i]);
+            }
+            var data1 = {
+                "cust_id": cust_id,
+                "items": item_store
+            };
+            ajax = $.ajax({
                 type: "PUT",
                 url: "/orders/" + order_id,
                 contentType:"application/json",
-                data: JSON.stringify(data)
+                data: JSON.stringify(data1)
             })
 
-        ajax.done(function(res){
-            //update_form_data(res)
-            $("#order_id").val(res.id);
-            $("#cust_id").val(res.cust_id);
-            var items = res[0].items;
-            for(var i=0;i< items.length;i++){
-                item = items[i];
-                $("#item_order_status").val(item.status); 
-            } 
-            console.log("Success");
+            ajax.done(function(res){
+                //update_form_data(res)
+                flash_message("Success");
+            });
+
+            ajax.fail(function(res){
+            clear_form_data();
+            flash_message(res.responseJSON.message);
+            });
+        });
+
+        ajax1.done(function(res){
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
-            console.log("not Success");
+        ajax1.fail(function(res){
+            clear_form_data();
             flash_message(res.responseJSON.message);
         });
     });
@@ -157,19 +169,19 @@ $(function () {
         var customer_id = $("#cust_id").val();
         var status = $("#item_order_status").val();
 
-        var queryString = ""
+        var queryString = "";
 
         if (order_id) {
-            queryString += 'order_id=' + order_id
+            queryString += 'order_id=' + order_id;
         }
         if (customer_id) {
-            queryString += 'cust_id=' + customer_id
+            queryString += 'cust_id=' + customer_id;
         }
         if (status) {
             if (queryString.length > 0) {
-                queryString += '&status=' + status
+                queryString += '&status=' + status;
             } else {
-                queryString += 'status=' + status
+                queryString += 'status=' + status;
             }
         }
 
@@ -181,7 +193,6 @@ $(function () {
         })
 
         ajax.done(function(res){
-            //alert(res.toSource())
             $("#order_results").empty();
             $("#order_results").append('Orders:');
             $("#order_results").append('<table class="table-striped">');
@@ -211,7 +222,6 @@ $(function () {
                 }
             }
             $("#order_results").append('</table>');
-            //var rowcount = $('#order_results tbody').children().length;
             if(temp == 0){
                 flash_message("Invalid Customer Id or Order ID ");
             } else {
@@ -224,7 +234,6 @@ $(function () {
         });
     });
     
-
     // ****************************************
     // Retrieve an Order
     // ****************************************
@@ -239,14 +248,13 @@ $(function () {
             data: ''
         })
         ajax.done(function(res){
-            //alert(res.toSource())
-            update_form_data(res)
-            flash_message("Success")
+            update_form_data(res);
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
-            clear_form_data()
-            flash_message(res.responseJSON.message)
+            clear_form_data();
+            flash_message(res.responseJSON.message);
         });
     });
 
@@ -266,12 +274,68 @@ $(function () {
         })
 
         ajax.done(function(res){
-            clear_form_data()
-            flash_message("Success")
+            clear_form_data();
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
-            flash_message("Server error!")
+            flash_message("Server error!");
+        });
+    });
+
+    // ****************************************
+    // Cancel an Order
+    // ****************************************
+
+    $("#cancel-btn").click(function () {
+
+        var order_id = $("#order_id").val();
+        var item_store = [];
+        var custom_id;
+        var data;
+
+        var ajax1 = $.ajax({
+            type: "GET",
+            url: "/orders/" + order_id,
+            contentType:"application/json",
+            data: ''
+        })
+    
+        ajax1.done(function(res){
+            custom_id = res.cust_id;
+            var items = res.items;
+            for(var i=0;i<items.length;i++){
+                item_store.push(items[i]);
+            }
+            for(var j = 0;j<item_store.length;j++){
+                item_store[j].status = "canceled";
+            }
+            var data1 = {
+                "cust_id": custom_id,
+                "items": item_store
+            };
+            ajax = $.ajax({
+                type: "PUT",
+                url: "/orders/" + order_id,
+                contentType:"application/json",
+                data: JSON.stringify(data1)
+            })
+
+            ajax.done(function(res){
+                update_form_data(res[0]);
+                flash_message("Order has been Canceled!");
+            });
+
+            ajax.fail(function(res){
+            clear_form_data();
+            flash_message(res.responseJSON.message);
+            });
+        });
+
+
+        ajax1.fail(function(res){
+            clear_form_data();
+            flash_message(res.responseJSON.message);
         });
     });
 
@@ -281,7 +345,7 @@ $(function () {
 
     $("#clear-btn").click(function () {
         $("#order_id").val("");
-        clear_form_data()
+        clear_form_data();
     });
 
     // ****************************************
@@ -312,7 +376,7 @@ $(function () {
                 var status;
                 for(var j = 0;j<items.length;j++){
                     var item = items[j];
-                    status = item.status
+                    status = item.status;
                 }
                 var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
                 $("#order_results").append(row);
@@ -320,11 +384,11 @@ $(function () {
 
             $("#order_results").append('</table>');
 
-            flash_message("Success")
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.message);
         });
 
     });
@@ -350,7 +414,6 @@ $(function () {
         };
 
         items_for_order.push(data);
-        console.log(data);
 
         clear_item_form_data();
 
@@ -376,23 +439,20 @@ $(function () {
             $("#item_results").append('Items:');
             $("#item_results").append('<table class="table-striped">');
             var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:15%">Order ID</th>'
-            header += '<th style="width:15%">Product ID</th>'
-            header += '<th style="width:25%">Name</th>'
-            header += '<th style="width:15%">Quantity</th>'
-            header += '<th style="width:15%">Price</th></tr>'
+            header += '<th style="width:20%">ID</th>'
+            header += '<th style="width:20%">Order ID</th>'
+            header += '<th style="width:20%">Product ID</th>'
+            header += '<th style="width:20%">Name</th>'
+            header += '<th style="width:20%">Quantity</th>'
+            header += '<th style="width:20%">Price</th></tr>'
             $("#item_results").append(header);
-            console.log(" list item ");
-            console.log(res[0]);
+    
             var t = res[0];
-            console.log(t.items.length);
             var items = res[3];
             for(var i = 0; i < res.length; i++) {
                 items = res[i].items;
                 for(var j = 0; j < items.length; j++){
                     item = items[0];
-                    console.log(item.prod_name)
                     var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td></tr>";
                     $("#item_results").append(row);
                 }
@@ -400,11 +460,11 @@ $(function () {
 
             $("#item_results").append('</table>');
 
-            flash_message("Success")
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
-            flash_message("res.responseJSON.message")
+            flash_message("res.responseJSON.message");
         });
 
     });
@@ -421,37 +481,37 @@ $(function () {
         var quantity = $("#item_quantity").val();
         var price = $("#item_price").val();
 
-        var queryString = ""
+        var queryString = "";
 
         if (product_id) {
-            queryString += 'prod_id=' + product_id
+            queryString += 'prod_id=' + product_id;
         }
         if (order_id) {
             if (queryString.length > 0) {
-                queryString += '&order_id=' + order_id
+                queryString += '&order_id=' + order_id;
             } else {
-                queryString += 'order_id=' + order_id
+                queryString += 'order_id=' + order_id;
             }
         }
         if (name) {
             if (queryString.length > 0) {
-                queryString += '&prod_name=' + name
+                queryString += '&prod_name=' + name;
             } else {
-                queryString += 'prod_name=' + name
+                queryString += 'prod_name=' + name;
             }
         }
         if (quantity) {
             if (queryString.length > 0) {
-                queryString += '&prod_qty=' + quantity
+                queryString += '&prod_qty=' + quantity;
             } else {
-                queryString += 'prod_qty=' + quantity
+                queryString += 'prod_qty=' + quantity;
             }
         }
         if (price) {
             if (queryString.length > 0) {
-                queryString += '&prod_price=' + price
+                queryString += '&prod_price=' + price;
             } else {
-                queryString += 'prod_price=' + price
+                queryString += 'prod_price=' + price;
             }
         }
 
@@ -463,7 +523,6 @@ $(function () {
         })
 
         ajax.done(function(res){
-            //console.log(res)
             $("#item_results").empty();
             $("#item_results").append('<table class="table-striped">');
             var header = '<tr>'
@@ -479,16 +538,13 @@ $(function () {
                 item = res[i].items;
                 for(var j = 0;j<item.length;j++){
                     prd_name = item[j].prod_name;
-                    console.log(name);
                     if(prd_name == name){
                     var row = "<tr><td>"+item[j].id+"</td><td>"+item[j].order_id+"</td><td>"+item[j].prod_id+"</td><td>"+item[j].prod_name+"</td><"+"</td><td>"+item[j].prod_qty+"</td><td>"+"</td><td>"+item[j].prod_price+"</td></tr>";
                     $("#item_results").append(row); 
                     k = i;      
                     }
                 }
-                
                 if(k) {
-                    console.log(res[i]);
                   update_item_form_data(res[k]);
                   $("#item_id").val(res[i].id);
                 }
@@ -496,11 +552,11 @@ $(function () {
 
             $("#item_results").append('</table>');
 
-            flash_message("Success")
+            flash_message("Success");
         });
 
         ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.message);
         });
     });
 
@@ -510,12 +566,12 @@ $(function () {
 
     $("#clear-btn").click(function () {
         $("#order_id").val("");
-        clear_form_data()
+        clear_form_data();
     });
 
     $("#clear-btn-item").click(function () {
         $("#prod_id").val("");
-        clear_item_form_data()
+        clear_item_form_data();
     });
 
 })
