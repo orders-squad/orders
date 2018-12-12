@@ -357,7 +357,7 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var order_id = $("#order_id").val();
+        var order_id = $("#item_order_id").val();
 
         var ajax = $.ajax({
             type: "DELETE",
@@ -367,12 +367,12 @@ $(function () {
         })
 
         ajax.done(function(res){
-            clear_form_data();
             flash_message("Success");
         });
 
         ajax.fail(function(res){
-            flash_message("Server error!");
+            clear_form_data();
+            flash_message(res.responseJSON.message);
         });
     });
 
@@ -382,7 +382,7 @@ $(function () {
 
     $("#cancel-btn").click(function () {
 
-        var order_id = $("#order_id").val();
+        var order_id = $("#item_order_id").val();
         var item_store = [];
         var custom_id;
         var data;
@@ -532,12 +532,13 @@ $(function () {
             $("#item_results").append('Items:');
             $("#item_results").append('<table class="table-striped">');
             var header = '<tr>'
-            header += '<th style="width:20%">ID</th>'
-            header += '<th style="width:20%">Order ID</th>'
+            header += '<th style="width:15%">ID</th>'
+            header += '<th style="width:15%">Order ID</th>'
             header += '<th style="width:20%">Product ID</th>'
-            header += '<th style="width:20%">Name</th>'
-            header += '<th style="width:20%">Quantity</th>'
-            header += '<th style="width:20%">Price</th></tr>'
+            header += '<th style="width:15%">Name</th>'
+            header += '<th style="width:15%">Quantity</th>'
+            header += '<th style="width:15%">Price</th>'
+            header += '<th style="width:15%">Status</th></tr>'
             $("#item_results").append(header);
     
             var t = res[0];
@@ -546,7 +547,9 @@ $(function () {
                 items = res[i].items;
                 for(var j = 0; j < items.length; j++){
                     item = items[0];
-                    var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td></tr>";
+                    console.log(item.status);
+                    var st = item.status;
+                    var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td><td>"+st+"</td></tr>";
                     $("#item_results").append(row);
                 }
             }
