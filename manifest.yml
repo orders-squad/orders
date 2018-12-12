@@ -13,11 +13,11 @@ applications:
   buildpack: python_buildpack
 
   services:
-  - PostgreSQL
+  - PostgreSQL-dev
   env:
     FLASK_APP : server
     FLASK_DEBUG : false
     DB_NAME : compose
     DB_USER : admin
-    DB_PASS : AUVJGCLENSMTYVCF
-    DB_ADDR : sl-us-south-1-portal.44.dblayer.com:16950
+    DB_PASS : STMKGFRCTXQFGVWS
+    DB_ADDR : sl-us-south-1-portal.45.dblayer.com:17961
