@@ -9,10 +9,10 @@ $(function () {
         $("#order_id").val(res.id);
         $("#cust_id").val(res.cust_id);
         var items = res.items;
-        for(var i=0;i< items.length;i++){
+        for (var i = 0; i < items.length; i++) {
             item = items[i];
-            $("#item_order_status").val(item.status); 
-        } 
+            $("#item_order_status").val(item.status);
+        }
     }
 
     /// Clears all form fields
@@ -55,16 +55,16 @@ $(function () {
     function update_items_view() {
         $("#items_for_order").empty();
         $("#items_for_order").append('<table class="table-striped">');
-        var header = '<tr>'
-        header += '<th style="width:20%">Product ID</th>'
-        header += '<th style="width:20%">Name</th>'
-        header += '<th style="width:20%">Quantity</th>'
-        header += '<th style="width:20%">Price</th></tr>'
-        header += '<th style="width:20%">Status</th></tr>'
+        var header = '<tr>';
+        header += '<th style="width:20%">Product ID</th>';
+        header += '<th style="width:20%">Name</th>';
+        header += '<th style="width:20%">Quantity</th>';
+        header += '<th style="width:20%">Price</th></tr>';
+        header += '<th style="width:20%">Status</th></tr>';
         $("#items_for_order").append(header);
-        for(var i = 0; i < items_for_order.length; i++) {
+        for (var i = 0; i < items_for_order.length; i++) {
             item = items_for_order[i];
-            var row = "<tr><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td></tr>"+item.status+"</td></tr>";
+            var row = "<tr><td>" + item.prod_id + "</td><td>" + item.prod_name + "</td><td>" + item.prod_qty + "</td><td>" + item.prod_price + "</td></tr>" + item.status + "</td></tr>";
             $("#items_for_order").append(row);
         }
 
@@ -88,16 +88,16 @@ $(function () {
         var ajax = $.ajax({
             type: "POST",
             url: "/orders",
-            contentType:"application/json",
+            contentType: "application/json",
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res);
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("res.responseJSON.message")
         });
     });
@@ -118,14 +118,14 @@ $(function () {
         var ajax1 = $.ajax({
             type: "GET",
             url: "/orders/" + order_id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
-    
-        ajax1.done(function(res){
+        });
+
+        ajax1.done(function (res) {
             custom_id = res.cust_id;
             var items = res.items;
-            for(var i=0;i<items.length;i++){
+            for (var i = 0; i < items.length; i++) {
                 item_store.push(items[i]);
             }
             var data1 = {
@@ -135,26 +135,26 @@ $(function () {
             ajax = $.ajax({
                 type: "PUT",
                 url: "/orders/" + order_id,
-                contentType:"application/json",
+                contentType: "application/json",
                 data: JSON.stringify(data1)
-            })
+            });
 
-            ajax.done(function(res){
+            ajax.done(function (res) {
                 //update_form_data(res)
                 flash_message("Success");
             });
 
-            ajax.fail(function(res){
-            clear_form_data();
-            flash_message(res.responseJSON.message);
+            ajax.fail(function (res) {
+                clear_form_data();
+                flash_message(res.responseJSON.message);
             });
         });
 
-        ajax1.done(function(res){
+        ajax1.done(function (res) {
             flash_message("Success");
         });
 
-        ajax1.fail(function(res){
+        ajax1.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
@@ -175,15 +175,15 @@ $(function () {
         var ajax1 = $.ajax({
             type: "PUT",
             url: "/orders/" + order_item_id + "/request-refund",
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
+        });
 
-        ajax1.done(function(res){
+        ajax1.done(function (res) {
             flash_message("Success");
         });
 
-        ajax1.fail(function(res){
+        ajax1.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
@@ -204,15 +204,15 @@ $(function () {
         var ajax1 = $.ajax({
             type: "PUT",
             url: "/orders/" + order_item_id + "/approve-refund",
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
+        });
 
-        ajax1.done(function(res){
+        ajax1.done(function (res) {
             flash_message("Success");
         });
 
-        ajax1.fail(function(res){
+        ajax1.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
@@ -232,25 +232,19 @@ $(function () {
         var ajax1 = $.ajax({
             type: "PUT",
             url: "/orders/" + order_item_id + "/deny-refund",
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
+        });
 
-        ajax1.done(function(res){
+        ajax1.done(function (res) {
             flash_message("Success");
         });
 
-        ajax1.fail(function(res){
+        ajax1.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
     });
-
-
-
-
-
-
 
 
     // ****************************************
@@ -281,52 +275,52 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/orders?" + queryString,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
+        });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             $("#order_results").empty();
             $("#order_results").append('Orders:');
             $("#order_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:20%">ID</th>'
-            header += '<th style="width:20%">Customer ID</th>'
-            header += '<th style="width:20%">Status</th></tr>'
+            var header = '<tr>';
+            header += '<th style="width:20%">ID</th>';
+            header += '<th style="width:20%">Customer ID</th>';
+            header += '<th style="width:20%">Status</th></tr>';
             $("#order_results").append(header);
             var temp = 0;
-            var j = 0;
-            for(var i = 0; i < res.length; i++) {
+            // var j = 0;
+            for (var i = 0; i < res.length; i++) {
                 order = res[i];
                 var items = order.items;
                 var status;
-                for(var j = 0;j<items.length;j++){
+                for (var j = 0; j < items.length; j++) {
                     var item = items[j];
                     status = item.status
                 }
-                if(customer_id == order.cust_id && order_id == order.id){
+                if (customer_id == order.cust_id && order_id == order.id) {
                     temp = 1;
-                    var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
+                    var row = "<tr><td>" + order.id + "</td><td>" + order.cust_id + "</td><td>" + status + "</td></tr>";
                     $("#order_results").append(row);
                     j = i;
-                } 
-                if(j) {
-                  update_form_data(res[j]);
+                }
+                if (j) {
+                    update_form_data(res[j]);
                 }
             }
             $("#order_results").append('</table>');
-            if(temp == 0){
+            if (temp == 0) {
                 flash_message("Invalid Customer Id or Order ID ");
             } else {
                 flash_message("Success");
             }
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message);
         });
     });
-    
+
     // ****************************************
     // Retrieve an Order
     // ****************************************
@@ -337,15 +331,15 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/orders/" + order_id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
-        ajax.done(function(res){
+        });
+        ajax.done(function (res) {
             update_form_data(res);
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
@@ -362,15 +356,15 @@ $(function () {
         var ajax = $.ajax({
             type: "DELETE",
             url: "/orders/" + order_id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: '',
-        })
+        });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
@@ -390,17 +384,17 @@ $(function () {
         var ajax1 = $.ajax({
             type: "GET",
             url: "/orders/" + order_id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
-    
-        ajax1.done(function(res){
+        });
+
+        ajax1.done(function (res) {
             custom_id = res.cust_id;
             var items = res.items;
-            for(var i=0;i<items.length;i++){
+            for (var i = 0; i < items.length; i++) {
                 item_store.push(items[i]);
             }
-            for(var j = 0;j<item_store.length;j++){
+            for (var j = 0; j < item_store.length; j++) {
                 item_store[j].status = "canceled";
             }
             var data1 = {
@@ -410,23 +404,23 @@ $(function () {
             ajax = $.ajax({
                 type: "PUT",
                 url: "/orders/" + order_id,
-                contentType:"application/json",
+                contentType: "application/json",
                 data: JSON.stringify(data1)
-            })
+            });
 
-            ajax.done(function(res){
+            ajax.done(function (res) {
                 update_form_data(res[0]);
                 flash_message("Order has been Canceled!");
             });
 
-            ajax.fail(function(res){
-            clear_form_data();
-            flash_message(res.responseJSON.message);
+            ajax.fail(function (res) {
+                clear_form_data();
+                flash_message(res.responseJSON.message);
             });
         });
 
 
-        ajax1.fail(function(res){
+        ajax1.fail(function (res) {
             clear_form_data();
             flash_message(res.responseJSON.message);
         });
@@ -450,28 +444,28 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/orders",
-            contentType:"application/json"
-        })
+            contentType: "application/json"
+        });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             $("#order_results").empty();
             $("#order_results").append('Orders:');
             $("#order_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:20%">ID</th>'
-            header += '<th style="width:20%">Customer ID</th>'
-            header += '<th style="width:20%">Status</th></tr>'
+            var header = '<tr>';
+            header += '<th style="width:20%">ID</th>';
+            header += '<th style="width:20%">Customer ID</th>';
+            header += '<th style="width:20%">Status</th></tr>';
             $("#order_results").append(header);
-            for(var i = 0; i < res.length; i++) {
+            for (var i = 0; i < res.length; i++) {
                 order = res[i];
                 var items = order.items;
                 var status;
-                for(var j = 0;j<items.length;j++){
+                for (var j = 0; j < items.length; j++) {
                     var item = items[j];
                     status = item.status;
                 }
-                var row = "<tr><td>"+order.id+"</td><td>"+order.cust_id+"</td><td>"+status+"</td></tr>";
+                var row = "<tr><td>" + order.id + "</td><td>" + order.cust_id + "</td><td>" + status + "</td></tr>";
                 $("#order_results").append(row);
             }
 
@@ -480,7 +474,7 @@ $(function () {
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message);
         });
 
@@ -523,33 +517,34 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/orders",
-            contentType:"application/json"
-        })
+            contentType: "application/json"
+        });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             $("#item_results").empty();
             $("#item_results").append('Items:');
             $("#item_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:15%">ID</th>'
-            header += '<th style="width:15%">Order ID</th>'
-            header += '<th style="width:20%">Product ID</th>'
-            header += '<th style="width:15%">Name</th>'
-            header += '<th style="width:15%">Quantity</th>'
-            header += '<th style="width:15%">Price</th>'
-            header += '<th style="width:15%">Status</th></tr>'
+            var header = '<tr>';
+            header += '<th style="width:15%">ID</th>';
+            header += '<th style="width:15%">Order ID</th>';
+            header += '<th style="width:20%">Product ID</th>';
+            header += '<th style="width:15%">Name</th>';
+            header += '<th style="width:15%">Quantity</th>';
+            header += '<th style="width:15%">Price</th>';
+            header += '<th style="width:15%">Status</th></tr>';
             $("#item_results").append(header);
-    
+
             var t = res[0];
             var items = res[3];
-            for(var i = 0; i < res.length; i++) {
+            for (var i = 0; i < res.length; i++) {
                 items = res[i].items;
-                for(var j = 0; j < items.length; j++){
+                for (var j = 0; j < items.length; j++) {
                     item = items[0];
-                    console.log(item.status);
+                    console.log(item);
+                    console.log(item);
                     var st = item.status;
-                    var row = "<tr><td>"+item.id+"</td><td>"+item.order_id+"</td><td>"+item.prod_id+"</td><td>"+item.prod_name+"</td><td>"+item.prod_qty+"</td><td>"+item.prod_price+"</td><td>"+st+"</td></tr>";
+                    var row = "<tr><td>" + item.id + "</td><td>" + item.order_id + "</td><td>" + item.prod_id + "</td><td>" + item.prod_name + "</td><td>" + item.prod_qty + "</td><td>" + item.prod_price + "</td><td>" + st + "</td></tr>";
                     $("#item_results").append(row);
                 }
             }
@@ -559,7 +554,7 @@ $(function () {
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("res.responseJSON.message");
         });
 
@@ -614,35 +609,37 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/orders?" + queryString,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
-        })
+        });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             $("#item_results").empty();
             $("#item_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:20%">ID</th>'
-            header += '<th style="width:20%">Order ID</th>'
-            header += '<th style="width:20%">Product ID</th>'
-            header += '<th style="width:20%">Name</th>'
-            header += '<th style="width:20%">Quantity</th>'
-            header += '<th style="width:20%">Price</th></tr>'
+            var header = '<tr>';
+            header += '<th style="width:20%">ID</th>';
+            header += '<th style="width:20%">Order ID</th>';
+            header += '<th style="width:20%">Product ID</th>';
+            header += '<th style="width:20%">Name</th>';
+            header += '<th style="width:20%">Quantity</th>';
+            header += '<th style="width:20%">Price</th></tr>';
             $("#item_results").append(header);
             var k = 0;
-            for(var i = 0; i < res.length; i++) {
+            for (var i = 0; i < res.length; i++) {
                 item = res[i].items;
-                for(var j = 0;j<item.length;j++){
+                for (var j = 0; j < item.length; j++) {
+                    console.log(item[j]);
                     prd_name = item[j].prod_name;
-                    if(prd_name == name){
-                    var row = "<tr><td>"+item[j].id+"</td><td>"+item[j].order_id+"</td><td>"+item[j].prod_id+"</td><td>"+item[j].prod_name+"</td><"+"</td><td>"+item[j].prod_qty+"</td><td>"+"</td><td>"+item[j].prod_price+"</td></tr>";
-                    $("#item_results").append(row); 
-                    k = i;      
+
+                    if (prd_name == name) {
+                        var row = "<tr><td>" + item[j].id + "</td><td>" + item[j].order_id + "</td><td>" + item[j].prod_id + "</td><td>" + item[j].prod_name + "</td><" + "</td><td>" + item[j].prod_qty + "</td><td>" + "</td><td>" + item[j].prod_price + "</td></tr>";
+                        $("#item_results").append(row);
+                        k = i;
                     }
                 }
-                if(k) {
-                  update_item_form_data(res[k]);
-                  $("#item_id").val(res[i].id);
+                if (k) {
+                    update_item_form_data(res[k]);
+                    $("#item_id").val(res[i].id);
                 }
             }
 
@@ -651,7 +648,7 @@ $(function () {
             flash_message("Success");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message);
         });
     });
@@ -670,4 +667,4 @@ $(function () {
         clear_item_form_data();
     });
 
-})
+});
