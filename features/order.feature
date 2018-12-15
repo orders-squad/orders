@@ -103,17 +103,24 @@ Scenario: Request a refund of an ordered item
   When I visit the "Home Page"
   And I set the "order_item_id" to "1"
   And I press the "request-refund" item button
+  And I press the "list" item button
   Then I should see the message "Success"
+  Then I should see "refund_requested" in the item results
 
 
 Scenario: Approve a refund of an ordered item
   When I visit the "Home Page"
   And I set the "order_item_id" to "1"
   And I press the "approve-refund" item button
+  And I press the "list" item button
   Then I should see the message "Success"
+  Then I should see "refund_approved" in the item results
+
 
 Scenario: Deny a refund of an ordered item
   When I visit the "Home Page"
   And I set the "order_item_id" to "1"
   And I press the "deny-refund" item button
+  And I press the "list" item button
   Then I should see the message "Success"
+  Then I should see "refund_denied" in the item results
